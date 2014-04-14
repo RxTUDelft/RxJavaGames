@@ -10,12 +10,14 @@ import javax.swing.JPanel;
 
 import rx.tudelft.pong.model.GameState;
 import rx.tudelft.pong.model.ball.Ball;
-import rx.tudelft.pong.model.paddle.Paddle;
 
 public class GamePanel extends JPanel {
 
 	private static final long serialVersionUID = -7004429743291206813L;
 	private final GameState state;
+	
+	public static final double paddleWidth = 0.02;
+	public static final double paddleHeigth = 0.1;
 
 	public GamePanel(GameState state, Dimension dim) {
 		super();
@@ -40,8 +42,8 @@ public class GamePanel extends JPanel {
 
 		graphics.setColor(Color.WHITE);
 
-		Integer paddleWidth = Double.valueOf(Paddle.paddleWidth * w).intValue();
-		Integer paddleHeight = Double.valueOf(Paddle.paddleHeigt * h).intValue();
+		Integer paddleWidth = Double.valueOf(GamePanel.paddleWidth * w).intValue();
+		Integer paddleHeight = Double.valueOf(GamePanel.paddleHeigth * h).intValue();
 		Integer ballDiameter = Double.valueOf(Ball.ballDiameter * w).intValue();
 
 		//left paddle

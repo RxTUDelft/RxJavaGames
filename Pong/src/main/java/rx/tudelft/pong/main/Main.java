@@ -7,9 +7,10 @@ import javax.swing.SwingUtilities;
 import rx.observables.SwingObservable;
 import rx.tudelft.pong.controller.KeyController;
 import rx.tudelft.pong.model.GameState;
+import rx.tudelft.pong.ui.BallObserver;
 import rx.tudelft.pong.ui.GameFrame;
 import rx.tudelft.pong.ui.GamePanel;
-import rx.tudelft.pong.ui.GamePanelObserver;
+import rx.tudelft.pong.ui.PaddleObserver;
 
 public final class Main {
 
@@ -27,10 +28,11 @@ public final class Main {
     		new GameFrame(panel, dim);
     		
     		//ui observer
-    		GamePanelObserver panelObserver = new GamePanelObserver(panel);
-    		state.getPlayer1().addObserver(panelObserver);
-    		state.getPlayer2().addObserver(panelObserver);
-    		state.getBall().addObserver(panelObserver);
+    		PaddleObserver paddleObserver = new PaddleObserver(panel);
+    		BallObserver ballObserver = new BallObserver(panel);
+    		state.getPlayer1().observable.subscribe(paddleObserver);
+    		state.getPlayer2().observable.subscribe(paddleObserver);
+    		state.getBall().observable.subscribe(ballObserver);
     		
     		//controller
     		new KeyController(state, SwingObservable.fromPressedKeys(panel).publish());

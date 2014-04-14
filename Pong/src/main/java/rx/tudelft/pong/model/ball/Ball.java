@@ -1,8 +1,8 @@
 package rx.tudelft.pong.model.ball;
 
-import java.util.Observable;
+import rx.subjects.PublishSubject;
 
-public class Ball extends Observable {
+public class Ball {
 
 	public static final double ballDiameter = 0.05;
 
@@ -10,6 +10,7 @@ public class Ball extends Observable {
 	private double posY;
 	private double velX;
 	private double velY;
+	public final PublishSubject<Ball> observable = PublishSubject.create();
 
 	public Ball(double posX, double posY, double velX, double velY) {
 		this.posX = posX;
@@ -29,8 +30,7 @@ public class Ball extends Observable {
 	public void setPositionX(double posX) {
 		this.posX = posX;
 
-		this.setChanged();
-		this.notifyObservers();
+		this.observable.onNext(this);
 	}
 
 	public double getPositionY() {
@@ -40,8 +40,7 @@ public class Ball extends Observable {
 	public void setPositionY(double posY) {
 		this.posY = posY;
 
-		this.setChanged();
-		this.notifyObservers();
+		this.observable.onNext(this);
 	}
 
 	public double getVelocityX() {
@@ -51,8 +50,7 @@ public class Ball extends Observable {
 	public void setVelocityX(double velX) {
 		this.velX = velX;
 
-		this.setChanged();
-		this.notifyObservers();
+		this.observable.onNext(this);
 	}
 
 	public double getVelocityY() {
@@ -62,7 +60,6 @@ public class Ball extends Observable {
 	public void setVelocityY(double velY) {
 		this.velY = velY;
 
-		this.setChanged();
-		this.notifyObservers();
+		this.observable.onNext(this);
 	}
 }

@@ -1,13 +1,11 @@
 package rx.tudelft.pong.model.paddle;
 
-import java.util.Observable;
+import rx.subjects.PublishSubject;
 
-public class Paddle extends Observable {
-	
-	public static final double paddleHeigt = 0.1;
-	public static final double paddleWidth = 0.02;
+public class Paddle {
 
 	private double position;
+	public final PublishSubject<Paddle> observable = PublishSubject.create();
 
 	public Paddle(double position) {
 		this.position = position;
@@ -24,7 +22,6 @@ public class Paddle extends Observable {
 	public void setPosition(double position) {
 		this.position = position;
 
-		this.setChanged();
-		this.notifyObservers();
+		this.observable.onNext(this);
 	}
 }

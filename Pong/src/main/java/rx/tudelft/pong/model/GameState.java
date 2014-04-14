@@ -4,6 +4,7 @@ import rx.tudelft.pong.model.ball.Ball;
 import rx.tudelft.pong.model.paddle.Direction;
 import rx.tudelft.pong.model.paddle.Inputs;
 import rx.tudelft.pong.model.paddle.Paddle;
+import rx.tudelft.pong.ui.GamePanel;
 
 public class GameState {
 
@@ -47,10 +48,10 @@ public class GameState {
 			case RESTING:
 				break;
 			case UP:
-				paddle.setPosition(Math.max(Paddle.paddleHeigt / 2, paddle.getPosition() - step));
+				paddle.setPosition(Math.max(GamePanel.paddleHeigth / 2, paddle.getPosition() - step));
 				break;
 			case DOWN:
-				paddle.setPosition(Math.min(1.0 - Paddle.paddleHeigt / 2, paddle.getPosition() + step));
+				paddle.setPosition(Math.min(1.0 - GamePanel.paddleHeigth / 2, paddle.getPosition() + step));
 				break;
 			default:
 				throw new IllegalArgumentException();
