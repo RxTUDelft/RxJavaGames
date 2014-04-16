@@ -1,10 +1,10 @@
 package rx.tudelft.pong.model;
 
+import java.util.Objects;
+
 import rx.tudelft.pong.model.ball.Ball;
-import rx.tudelft.pong.model.paddle.Direction;
 import rx.tudelft.pong.model.paddle.Inputs;
 import rx.tudelft.pong.model.paddle.Paddle;
-import rx.tudelft.pong.ui.GamePanel;
 
 public class GameState {
 
@@ -35,30 +35,35 @@ public class GameState {
 	}
 
 	public GameState step(Long stepMillis, Inputs inputs) {
-		stepPaddle(stepMillis, this.player1, inputs.getPlayer1());
-		stepPaddle(stepMillis, this.player2, inputs.getPlayer2());
-		stepBall(stepMillis, this.ball);
-		
-		return this;
+		Paddle paddle1 = this.player1.move(stepMillis.doubleValue() / 1000, inputs.getPlayer1());
+		Paddle paddle2 = this.player2.move(stepMillis.doubleValue() / 1000, inputs.getPlayer2());
+		Ball ball = this.stepBall(stepMillis);
+		return new GameState(paddle1, paddle2, ball);
 	}
 
-	private static void stepPaddle(Long stepMillis, Paddle paddle, Direction direction) {
-		double step = stepMillis.doubleValue() / 1000;
-		switch (direction) {
-			case RESTING:
-				break;
-			case UP:
-				paddle.setPosition(Math.max(GamePanel.paddleHeigth / 2, paddle.getPosition() - step));
-				break;
-			case DOWN:
-				paddle.setPosition(Math.min(1.0 - GamePanel.paddleHeigth / 2, paddle.getPosition() + step));
-				break;
-			default:
-				throw new IllegalArgumentException();
-		}
+	private Ball stepBall(Long stepMillis) {
+		return this.ball;
 	}
-	
-	private static void stepBall(Long stepMillis, Ball ball) {
-		//TODO needs to be implemented; returns its input value for now.
+
+	@Override
+	public boolean equals(Object other) {
+		if (other instanceof GameState) {
+			GameState that = (GameState) other;
+			return Objects.equals(this.player1, that.player1)
+					&& Objects.equals(this.player2, that.player2)
+					&& Objects.equals(this.ball, that.ball);
+		}
+		return false;
+	}
+
+	@Override
+	public int hashCode() {
+		return Objects.hash(this.player1, this.player2, this.ball);
+	}
+
+	@Override
+	public String toString() {
+		return "<GameState[" + String.valueOf(this.player1) + ", " + String.valueOf(this.player2)
+				+ ", " + String.valueOf(this.ball) + "]>";
 	}
 }
