@@ -7,8 +7,8 @@ import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
 import rx.Observable;
+import rx.concurrency.SwingScheduler;
 import rx.observables.ConnectableObservable;
-import rx.schedulers.SwingScheduler;
 import rx.tudelft.pong.model.Direction;
 import rx.tudelft.pong.model.GameState;
 import rx.tudelft.pong.model.paddle.Inputs;
@@ -33,7 +33,7 @@ public class KeyController extends Observable<GameState> {
 			Observable<GameState> scanned = sampled.scan(initState,
 					(GameState gs, Inputs input) -> gs.step(frameRateMillis, input));
 			
-			scanned.subscribe(subscriber);
+			return scanned.subscribe(subscriber);
 		});
 
 		keys.connect();
