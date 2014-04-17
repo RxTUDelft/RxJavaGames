@@ -1,6 +1,4 @@
-package rx.tudelft.pong.model.paddle;
-
-import rx.tudelft.pong.model.Direction;
+package model;
 
 public class Inputs {
 

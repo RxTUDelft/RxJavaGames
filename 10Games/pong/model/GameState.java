@@ -1,10 +1,6 @@
-package rx.tudelft.pong.model;
+package model;
 
 import java.util.Objects;
-
-import rx.tudelft.pong.model.ball.Ball;
-import rx.tudelft.pong.model.paddle.Inputs;
-import rx.tudelft.pong.model.paddle.Paddle;
 
 public class GameState {
 
@@ -42,6 +38,24 @@ public class GameState {
 	}
 
 	private Ball stepBall(Long stepMillis) {
+		// double step = stepMillis.doubleValue() / 1000;
+		//
+		// if (Double.compare(0.0, this.ball.getPositionX() - GamePanel.paddleWidth * 2) >= 0) {
+		// if (this.ball.getPositionY() > this.player1.getPosition() + GamePanel.paddleHeigth / 2
+		// || this.ball.getPositionY() < this.player1.getPosition()
+		// - GamePanel.paddleHeigth / 2) {
+		// System.out.println("mis");
+		// return this.ball.move(step, Direction.RESTING, Direction.RESTING);
+		// }
+		// else {
+		// System.out.println("raak");
+		// return this.ball.move(step, Direction.DOWN, Direction.RESTING);
+		// }
+		// }
+		// else {
+		// return this.ball.move(step, Direction.UP, Direction.RESTING);
+		// // System.out.println(this.ball.getPositionX());
+		// }
 		return this.ball;
 	}
 

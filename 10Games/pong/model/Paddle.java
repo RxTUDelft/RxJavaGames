@@ -1,9 +1,8 @@
-package rx.tudelft.pong.model.paddle;
+package model;
 
 import java.util.Objects;
 
-import rx.tudelft.pong.model.Direction;
-import rx.tudelft.pong.ui.GamePanel;
+import ui.GamePanel;
 
 public class Paddle {
 

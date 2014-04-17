@@ -1,4 +1,4 @@
-package rx.tudelft.pong.model;
+package model;
 
 public enum Direction {
 	UP,

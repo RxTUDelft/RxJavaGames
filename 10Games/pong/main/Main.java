@@ -1,14 +1,14 @@
-package rx.tudelft.pong.main;
+package main;
 
 import java.awt.Dimension;
 
 import javax.swing.SwingUtilities;
 
+import model.GameState;
 import rx.observables.SwingObservable;
-import rx.tudelft.pong.controller.KeyController;
-import rx.tudelft.pong.model.GameState;
-import rx.tudelft.pong.ui.GameFrame;
-import rx.tudelft.pong.ui.GamePanel;
+import ui.GameFrame;
+import ui.GamePanel;
+import controller.KeyController;
 
 public final class Main {
 

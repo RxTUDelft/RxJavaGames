@@ -1,8 +1,6 @@
-package rx.tudelft.pong.model.ball;
+package model;
 
 import java.util.Objects;
-
-import rx.tudelft.pong.model.Direction;
 
 public class Ball {
 

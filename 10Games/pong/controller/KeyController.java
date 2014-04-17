@@ -1,4 +1,4 @@
-package rx.tudelft.pong.controller;
+package controller;
 
 import java.awt.event.KeyEvent;
 import java.util.List;
@@ -6,12 +6,12 @@ import java.util.Set;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
+import model.Direction;
+import model.GameState;
+import model.Inputs;
 import rx.Observable;
 import rx.concurrency.SwingScheduler;
 import rx.observables.ConnectableObservable;
-import rx.tudelft.pong.model.Direction;
-import rx.tudelft.pong.model.GameState;
-import rx.tudelft.pong.model.paddle.Inputs;
 
 public class KeyController extends Observable<GameState> {
 

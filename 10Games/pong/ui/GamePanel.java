@@ -1,4 +1,4 @@
-package rx.tudelft.pong.ui;
+package ui;
 
 import java.awt.Color;
 import java.awt.Dimension;
@@ -9,9 +9,9 @@ import java.awt.RenderingHints;
 
 import javax.swing.JPanel;
 
+import model.Ball;
+import model.GameState;
 import rx.Observer;
-import rx.tudelft.pong.model.GameState;
-import rx.tudelft.pong.model.ball.Ball;
 
 public class GamePanel extends JPanel implements Observer<GameState> {
 

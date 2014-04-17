@@ -1,4 +1,4 @@
-package rx.tudelft.pong.ui;
+package ui;
 
 import java.awt.Dimension;
 
