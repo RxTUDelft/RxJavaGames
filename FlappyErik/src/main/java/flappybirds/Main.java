@@ -17,7 +17,6 @@ import javafx.scene.media.AudioClip;
 import javafx.scene.paint.Color;
 import javafx.stage.Stage;
 import rx.Observable;
-import rx.schedulers.TestScheduler;
 import rx.subjects.PublishSubject;
 import rx.subjects.Subject;
 
@@ -27,8 +26,6 @@ public class Main extends Application {
 		Application.launch();
 	}
 
-	private TestScheduler scheduler = new TestScheduler();
-	
 	private final String jumpAudio = this.getClass().getResource("/smb3_jump.wav").toString();
 	private final String coinAudio = this.getClass().getResource("/smb3_coin.wav").toString();
 	private final String startAudio = this.getClass().getResource("/smb3_power-up.wav").toString();
@@ -85,8 +82,8 @@ public class Main extends Application {
 		});
 
 		// Heart
-		Image heartTile = new Image("Star.png");
-		Image starTile = new Image("Heart.png");
+		Image heartTile = new Image("Heart.png");
+		Image starTile = new Image("Star.png");
 		ImageView heart = new ImageView(heartTile);
 		root.getChildren().add(heart);
 		heart.setTranslateY(200 - screenHeight);
@@ -113,11 +110,9 @@ public class Main extends Application {
 
 		velocity.subscribe(dy -> bug.setTranslateY(bug.getTranslateY() - dy));
 
-		Utils.spaceBar(scene)
-				.filter(event -> bugHomeY - 1 <= bug.getTranslateY())
-				.doOnEach(event -> new AudioClip(this.jumpAudio).play()).subscribe(event -> jumps.onNext(jumpSpeed));
-		Utils.enterKey(scene).subscribe(
-				event -> this.scheduler.advanceTimeBy(10 / 60, TimeUnit.SECONDS));
+		KeyObservables.spaceBar(scene).filter(event -> bugHomeY - 1 <= bug.getTranslateY())
+				.doOnEach(event -> new AudioClip(this.jumpAudio).play())
+				.subscribe(event -> jumps.onNext(jumpSpeed));
 
 		Observable<Bounds> heartPosition = clock.map(i -> heart.localToScene(heart
 				.getLayoutBounds()));
@@ -126,18 +121,15 @@ public class Main extends Application {
 		Observable
 				.combineLatest(bugPosition, heartPosition,
 						(Bounds bugBounds, Bounds heartBounds) -> bugBounds.intersects(heartBounds))
-				.buffer(2, 1)
-				.filter(hits -> hits.get(0) != hits.get(1))
-				.subscribe(
-						hits -> {
-							if (!hits.get(0)) {
-								heart.setImage(starTile);
-								new AudioClip(this.coinAudio).play();
-							}
-							if (!hits.get(1)) {
-								heart.setImage(starTile);
-							}
-						});
+				.buffer(2, 1).filter(hits -> hits.get(0) != hits.get(1)).subscribe(hits -> {
+					if (!hits.get(0)) {
+						heart.setImage(starTile);
+						new AudioClip(this.coinAudio).play();
+					}
+					if (!hits.get(1)) {
+						heart.setImage(starTile);
+					}
+				});
 
 		stage.setOnShown(event -> new AudioClip(this.startAudio).play());
 
