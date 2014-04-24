@@ -18,11 +18,13 @@ import rx.pong.model.Ball;
 import rx.pong.model.Direction;
 import rx.pong.model.Paddle;
 import rx.pong.model.PaddleState;
+import rx.pong.model.Score;
 import rx.pong.observables.FXObservable;
 import rx.pong.ui.PongBackground;
 import rx.pong.ui.PongBall;
 import rx.pong.ui.PongBorder;
 import rx.pong.ui.PongPaddle;
+import rx.pong.ui.PongScore;
 
 public class Main extends Application {
 
@@ -37,6 +39,7 @@ public class Main extends Application {
 
 	// model
 	private Ball ball = new Ball();
+	private Score score = new Score();
 
 	// ui
 	private final PongPaddle leftPaddleUI = new PongPaddle(0.02 * Main.screenWidth,
@@ -44,6 +47,8 @@ public class Main extends Application {
 	private final PongPaddle rightPaddleUI = new PongPaddle(0.02 * Main.screenWidth,
 			0.1 * Main.screenHeight, Color.WHITE);
 	private final PongBall ballUI = new PongBall(ballSize, Color.WHITE);
+	private final PongScore leftScore = new PongScore();
+	private final PongScore rightScore = new PongScore();
 
 	// functions
 	private final Func1<Paddle, Double> paddleYPos = (paddle) -> this.leftPaddleUI.getHeight() / 2
@@ -67,6 +72,14 @@ public class Main extends Application {
 
 		// Background
 		root.getChildren().add(new PongBackground(Main.screenWidth, Main.screenHeight));
+		
+		// Score
+		root.getChildren().add(this.leftScore);
+		root.getChildren().add(this.rightScore);
+		this.leftScore.setTranslateX(Main.screenWidth / 4);
+		this.leftScore.setTranslateY(100 - Main.screenHeight);
+		this.rightScore.setTranslateX(3 * Main.screenWidth / 4);
+		this.rightScore.setTranslateY(100 - Main.screenHeight);
 
 		//borders
 		PongBorder bottomBorder = new PongBorder(Main.screenWidth, 1, Color.BLACK);
@@ -151,19 +164,23 @@ public class Main extends Application {
 
 		FXObservable.intersect(leftBorderBounds, ballBounds)
 				.subscribe(hits -> {
-					if (!hits.get(0) || !hits.get(1)) {
+					if (!hits.get(0)) {
 						this.ball = new Ball(this.ball);
 						this.setBallXPos.call();
 						this.setBallYPos.call();
+						this.score = this.score.incrPlayer2();
+						this.rightScore.setText(this.score.getScore2() + "");
 					}
 				});
 
 		FXObservable.intersect(rightBorderBounds, ballBounds)
 				.subscribe(hits -> {
-					if (!hits.get(0) || !hits.get(1)) {
+					if (!hits.get(0)) {
 						this.ball = new Ball(this.ball);
 						this.setBallXPos.call();
 						this.setBallYPos.call();
+						this.score = this.score.incrPlayer1();
+						this.leftScore.setText(this.score.getScore1() + "");
 					}
 				});
 

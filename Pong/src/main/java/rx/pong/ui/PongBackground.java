@@ -12,5 +12,9 @@ public class PongBackground extends Canvas {
 		GraphicsContext context = this.getGraphicsContext2D();
 		context.setFill(Color.BLACK);
 		context.fillRect(0, 0, screenWidth, screenHeight);
+		
+		context.setStroke(Color.WHITE);
+		context.setLineWidth(2);
+		context.strokeLine(screenWidth / 2, screenHeight, screenWidth / 2, 0);
 	}
 }
