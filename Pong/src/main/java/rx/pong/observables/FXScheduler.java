@@ -1,4 +1,4 @@
-package flappybirds;
+package rx.pong.observables;
 
 import java.util.concurrent.TimeUnit;
 
@@ -6,15 +6,19 @@ import javafx.application.Platform;
 import rx.Scheduler;
 import rx.Subscription;
 import rx.functions.Action1;
-import rx.subscriptions.Subscriptions;
+import rx.subscriptions.CompositeSubscription;
 
-public class PlatformScheduler extends Scheduler {
-	
-	private final Inner inner;
-	
-	public PlatformScheduler() {
-		super();
-		this.inner = new MyInner();
+public class FXScheduler extends Scheduler {
+
+	private static final FXScheduler INSTANCE = new FXScheduler();
+
+	private final Inner inner = new FXInner();
+
+	public static FXScheduler getInstance() {
+		return INSTANCE;
+	}
+
+	private FXScheduler() {
 	}
 
 	@Override
@@ -28,10 +32,10 @@ public class PlatformScheduler extends Scheduler {
 		this.inner.schedule(action, delayTime, unit);
 		return this.inner;
 	}
-	
-	public static class MyInner extends Inner {
 
-		private Subscription subscription = Subscriptions.empty();
+	public static class FXInner extends Inner {
+
+		private final CompositeSubscription subscription = new CompositeSubscription();
 
 		@Override
 		public void unsubscribe() {
@@ -65,7 +69,7 @@ public class PlatformScheduler extends Scheduler {
 			if (!this.isUnsubscribed()) {
 				Platform.runLater(() -> {
 					if (!this.isUnsubscribed()) {
-						action.call(MyInner.this);
+						action.call(FXInner.this);
 					}
 				});
 			}
