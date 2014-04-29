@@ -50,36 +50,38 @@ public class Board extends Observable<Tile> {
 	public boolean set(Sprite s, int x, int y) {
 		assert this.isWithinBorders(x, y);
 		Tile tile = this.tiles.get(x).get(y);
-		switch (tile.getSprite()) {
-			case EMPTY:
-				tile.setSprite(s);
-				return true;
-			case O:
-				return false;
-			case X:
-				return false;
-			default:
-				throw new IllegalArgumentException("Sprite of type: " + tile.getSprite()
-						+ " is not covered here.");
+		if (!tile.getSprite().isPresent()) {
+			tile.setSprite(Optional.of(s));
+			return true;
 		}
+		return false;
 	}
 
-	public Sprite spriteAt(int x, int y) {
+	public void reset() {
+		this.tiles.stream()
+				.forEach(list -> list.stream()
+						.forEach(tile -> tile.setSprite(Optional.empty())));
+	}
+
+	public Optional<Sprite> spriteAt(int x, int y) {
 		assert this.isWithinBorders(x, y);
+
 		return this.tiles.get(x).get(y).getSprite();
 	}
 
 	public Set<Tile> getTilesInRowOf(Tile t) {
 		int y = t.getY();
 		assert this.isWithinRange(y);
-		
-		return this.tiles.stream().map(list -> list.get(y)).collect(Collectors.toSet());
+
+		return this.tiles.stream()
+				.map(list -> list.get(y))
+				.collect(Collectors.toSet());
 	}
 
 	public Set<Tile> getTilesInColumnOf(Tile t) {
 		return new HashSet<>(this.tiles.get(t.getX()));
 	}
-	
+
 	public Optional<Set<Tile>> getTilesInDiagonalUpDown(Tile t) {
 		if (t.getX() == t.getY()) {
 			Set<Tile> ud = new HashSet<>(this.size);
@@ -99,7 +101,6 @@ public class Board extends Observable<Tile> {
 			}
 			return Optional.of(du);
 		}
-
 		return Optional.empty();
 	}
 }
