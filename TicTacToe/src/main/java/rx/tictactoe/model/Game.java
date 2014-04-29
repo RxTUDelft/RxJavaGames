@@ -1,61 +1,70 @@
 package rx.tictactoe.model;
 
-import java.util.Optional;
-import java.util.Set;
-import java.util.function.Predicate;
+import rx.Observable;
+import rx.subjects.PublishSubject;
 
-import rx.Observer;
-
-public class Game implements Observer<Tile> {
+public class Game extends Observable<GameState> implements IGameStateManager {
 
 	private final Board board;
+	private GameState gameState;
+	private Sprite turn;
+	private PublishSubject<GameState> subject;
 
-	public Game(int size) {
-		this.board = new Board(size);
-		this.board.subscribe(this);
+	public Game(Board board, Sprite first) {
+		this(board, first, PublishSubject.create());
 	}
+	
+	private Game(Board board, Sprite first, PublishSubject<GameState> subject) {
+		super(subscriber -> subject.subscribe(subscriber));
+		this.board = board;
 
+		this.gameState = GameState.STOPPED;
+		this.turn = first;
+		this.subject = subject;
+	}
+	
 	public Board getBoard() {
 		return this.board;
 	}
 
-	@Override
-	public void onCompleted() {
+	public void performMove(int x, int y) {
+		if (this.gameState == GameState.STARTED) {
+			this.board.set(this.turn, x, y);
+			this.switchTurns();
+		}
+	}
+
+	private void switchTurns() {
+		if (this.gameState == GameState.STARTED) {
+    		if (this.turn == Sprite.X) {
+    			this.turn = Sprite.O;
+    		}
+    		else {
+    			assert this.turn == Sprite.O;
+    			this.turn = Sprite.X;
+    		}
+		}
 	}
 
 	@Override
-	public void onError(Throwable e) {
-		e.printStackTrace();
+	public void startNewGame() {
+		this.board.reset();
+		this.gameState = GameState.STARTED;
+		this.subject.onNext(this.gameState);
 	}
 
 	@Override
-	public void onNext(Tile t) {
-		System.out.println(this.detectWinningChain(t));
-	}
-	
-	private Optional<Set<Tile>> detectWinningChain(Tile t) {
-		Predicate<Tile> p = (tile) -> tile.getSprite() == t.getSprite();
-		
-		Set<Tile> row = this.board.getTilesInRowOf(t);
-		if (row.stream().allMatch(p)) {
-			return Optional.of(row);
+	public void wonBy(Sprite sprite) {
+		switch (sprite) {
+			case O:
+				this.gameState = GameState.WON_O;
+				break;
+			case X:
+				this.gameState = GameState.WON_X;
+				break;
+			default:
+				throw new IllegalArgumentException("Sprite " + sprite + " is not allowed here!");
 		}
-		
-		Set<Tile> column = this.board.getTilesInColumnOf(t);
-		if (column.stream().allMatch(p)) {
-			return Optional.of(column);
-		}
-		
-		Optional<Set<Tile>> diagUD = this.board.getTilesInDiagonalUpDown(t);
-		if (diagUD.isPresent() && diagUD.get().stream().allMatch(p)) {
-			return diagUD;
-		}
-		
-		Optional<Set<Tile>> diagDU = this.board.getTilesInDiagonalDownUp(t);
-		if (diagDU.isPresent() && diagDU.get().stream().allMatch(p)) {
-			return diagDU;
-		}
-		
-		return Optional.empty();
+		this.subject.onNext(this.gameState);
 	}
 }

@@ -1,6 +1,7 @@
 package rx.tictactoe.model;
 
 import java.util.Objects;
+import java.util.Optional;
 
 import rx.Observable;
 import rx.subjects.PublishSubject;
@@ -9,7 +10,7 @@ public final class Tile extends Observable<Tile> {
 
 	private final int x;
 	private final int y;
-	private Sprite sprite;
+	private Optional<Sprite> sprite;
 
 	private final PublishSubject<Tile> subject;
 
@@ -21,7 +22,7 @@ public final class Tile extends Observable<Tile> {
 		super(subscriber -> subject.subscribe(subscriber));
 		this.x = x;
 		this.y = y;
-		this.sprite = Sprite.EMPTY;
+		this.sprite = Optional.empty();
 		this.subject = subject;
 	}
 
@@ -33,11 +34,11 @@ public final class Tile extends Observable<Tile> {
 		return this.y;
 	}
 
-	public Sprite getSprite() {
+	public Optional<Sprite> getSprite() {
 		return this.sprite;
 	}
 
-	public void setSprite(Sprite sprite) {
+	public void setSprite(Optional<Sprite> sprite) {
 		this.sprite = sprite;
 		
 		this.subject.onNext(this);
