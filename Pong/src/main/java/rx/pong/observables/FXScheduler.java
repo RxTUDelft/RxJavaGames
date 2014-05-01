@@ -6,7 +6,7 @@ import javafx.application.Platform;
 import rx.Scheduler;
 import rx.Subscription;
 import rx.functions.Action1;
-import rx.subscriptions.CompositeSubscription;
+import rx.subscriptions.Subscriptions;
 
 public class FXScheduler extends Scheduler {
 
@@ -35,7 +35,7 @@ public class FXScheduler extends Scheduler {
 
 	public static class FXInner extends Inner {
 
-		private final CompositeSubscription subscription = new CompositeSubscription();
+		private final Subscription subscription = Subscriptions.create(() -> {});
 
 		@Override
 		public void unsubscribe() {
@@ -49,30 +49,12 @@ public class FXScheduler extends Scheduler {
 
 		@Override
 		public void schedule(Action1<Inner> action, long delayTime, TimeUnit unit) {
-			this.schedule(t1 -> {
-				if (!this.isUnsubscribed()) {
-					try {
-						Thread.sleep(TimeUnit.MILLISECONDS.convert(delayTime, unit));
-					}
-					catch (InterruptedException e) {
-						e.printStackTrace();
-					}
-				}
-				if (!this.isUnsubscribed()) {
-					action.call(t1);
-				}
-			});
+			this.schedule(action);
 		}
 
 		@Override
 		public void schedule(Action1<Inner> action) {
-			if (!this.isUnsubscribed()) {
-				Platform.runLater(() -> {
-					if (!this.isUnsubscribed()) {
-						action.call(FXInner.this);
-					}
-				});
-			}
+			Platform.runLater(() -> action.call(FXInner.this));
 		}
 	}
 }
