@@ -2,8 +2,8 @@ package rx.tictactoe.model;
 
 public enum GameState {
 
-	STOPPED,
-	STARTED,
+	TURN_X,
+	TURN_O,
 	WON_X,
 	WON_O;
 }
