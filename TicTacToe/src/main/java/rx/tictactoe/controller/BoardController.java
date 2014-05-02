@@ -1,7 +1,5 @@
 package rx.tictactoe.controller;
 
-import java.util.Optional;
-
 import rx.Observer;
 import rx.tictactoe.model.Sprite;
 import rx.tictactoe.model.Tile;
@@ -29,21 +27,10 @@ public class BoardController implements Observer<Tile> {
 	public void onNext(Tile t) {
 		int x = t.getX();
 		int y = t.getY();
-		Optional<Sprite> sprite = t.getSprite();
-		if (sprite.isPresent()) {
-			switch (sprite.get()) {
-				case O:
-					this.ui.setTile(x, y, Images.OVAL);
-					break;
-				case X:
-					this.ui.setTile(x, y, Images.CROSS);
-					break;
-				default:
-					break;
-			}
-		}
-		else {
-			this.ui.setTile(x, y, Images.EMPTY);
-		}
+		Images tile = t
+				.getSprite()
+				.map(s -> s == Sprite.O ? Images.OVAL : Images.CROSS)
+				.orElse(Images.EMPTY);
+		this.ui.setTile(x, y, tile);
 	}
 }
