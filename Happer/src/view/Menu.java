@@ -1,81 +1,53 @@
 package view;
 
-import model.Game;
-import controller.GameController;
-import javafx.event.ActionEvent;
-import javafx.event.EventHandler;
 import javafx.scene.control.Button;
 import javafx.scene.layout.VBox;
+import controller.MenuController;
 
 public class Menu extends VBox {
-	MainFrame gameFrame;
-	Button start, stop, restart, settings;
+	MainFrame mainFrame;
+	MenuController menuController;
+	Button btnStart, btnStop, btnRestart, btnSettings;
 	
 	public Menu(MainFrame frame) {
 		setId("menu");
 		setSpacing(20);
 		
-		gameFrame = frame;
+		mainFrame = frame;
+		menuController = new MenuController(mainFrame, this);
 		
-		start = new Button("Start");
-		start.setPrefWidth(100);
-		start.setOnAction(new EventHandler<ActionEvent>() {	
-			@Override
-			public void handle(ActionEvent event) {
-				Game game = new Game();
-				GameView gv = new GameView(game);
-				new GameController(game);
-				
-				gameFrame.setLeftPane(gv);
-				start.setDisable(true);
-				stop.setDisable(false);
-				restart.setDisable(false);
-				settings.setDisable(true);
-			}
-		});
-		getChildren().add(start);
+		btnStart = new MenuButton("Start", true);
+		menuController.addStartListener(btnStart);
+		getChildren().add(btnStart);
 		
-		stop = new Button("Stop");
-		stop.setPrefWidth(100);
-		stop.setDisable(true);
-		stop.setOnAction(new EventHandler<ActionEvent>() {
-			@Override
-			public void handle(ActionEvent event) {
-				gameFrame.setLeftPane(new StartScreen());
-				start.setDisable(false);
-				stop.setDisable(true);
-				restart.setDisable(true);
-				settings.setDisable(false);
-			}
-		});
-		getChildren().add(stop);
+		btnStop = new MenuButton("Stop", false);
+		menuController.addStopListener(btnStop);
+		getChildren().add(btnStop);
 		
-		restart = new Button("Restart");
-		restart.setPrefWidth(100);
-		restart.setDisable(true);
-		restart.setOnAction(new EventHandler<ActionEvent>() {	
-			@Override
-			public void handle(ActionEvent event) {
-				stop.fire();
-				start.fire();
-			}
-		});
-		getChildren().add(restart);
+		btnRestart = new MenuButton("Restart", false);
+		menuController.addRestartListener(btnRestart);
+		getChildren().add(btnRestart);
 		
-		settings = new Button("Settings");
-		settings.setPrefWidth(100);
-		settings.setOnAction(new EventHandler<ActionEvent>() {	
-			@Override
-			public void handle(ActionEvent event) {
-				gameFrame.setLeftPane(new SettingsView());
-				start.setDisable(false);
-				stop.setDisable(false);
-				restart.setDisable(true);
-				settings.setDisable(true);
-			}
-		});
-		getChildren().add(settings);
-		
-		getStylesheets().add(getClass().getResource("Menu.css").toExternalForm());
+		btnSettings = new MenuButton("Settings", true);
+		menuController.addSettingsListener(btnSettings);
+		getChildren().add(btnSettings);
 	}
+
+	
+	public Button getBtnStart() {
+		return btnStart;
+	}
+
+	public Button getBtnStop() {
+		return btnStop;
+	}
+
+	public Button getBtnRestart() {
+		return btnRestart;
+	}
+
+	public Button getBtnSettings() {
+		return btnSettings;
+	}
+	
 }

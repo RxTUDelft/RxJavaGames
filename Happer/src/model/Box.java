@@ -8,7 +8,7 @@ public class Box extends MovableObject {
 	public Box(Square square) {
 		super(square);
 		
-		Image imgBox = new Image(getClass().getResourceAsStream("/images/box.png"));
+		Image imgBox = new Image("/images/box.png");
 		imageView = new ImageView(imgBox);
 	}
 

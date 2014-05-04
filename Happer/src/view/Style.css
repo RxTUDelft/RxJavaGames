@@ -1,0 +1,46 @@
+#menu {
+	-fx-padding:20px;
+	-fx-background-color: darkslategray;
+}
+
+#menu button {
+	-fx-padding:5px;
+}
+
+#game {
+	-fx-alignment: top-left;
+	-fx-background-color:lightgray;
+}
+
+#settingsPane {
+	-fx-padding: 20px 0 0 0;
+	-fx-font-family: Tahoma;
+	-fx-font-size: 15px;
+	-fx-hgap: 20px;
+	-fx-vgap: 30px;
+	-fx-alignment: top-center;
+	-fx-background-color:whitesmoke ;
+}
+
+#settingsTitle {
+	-fx-font-size: 30px;
+}
+
+
+#textBoxWon, #textBoxLost {
+    -fx-font: 50px Tahoma;
+    -fx-padding: 5px 10px;
+    -fx-text-fill: black;
+}
+
+#textBoxWon {
+	-fx-background-color:rgb(128,255,0);
+}
+
+#textBoxLost {
+	-fx-background-color:rgb(255,128,64);
+}
+
+#endGamePane {
+	-fx-background-color:rgba(255,255,255,0.5);
+}

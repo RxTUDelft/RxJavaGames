@@ -4,10 +4,10 @@ import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 
 public class Pacman extends MovableObject {
-	private final Image pacmanRight = new Image(getClass().getResourceAsStream("/images/pacman_right.png"));
-	private final Image pacmanLeft = new Image(getClass().getResourceAsStream("/images/pacman_left.png"));
-	private final Image pacmanUp = new Image(getClass().getResourceAsStream("/images/pacman_up.png"));
-	private final Image pacmanDown = new Image(getClass().getResourceAsStream("/images/pacman_down.png")); 
+	private final Image pacmanRight = new Image("/images/pacman_right.png");
+	private final Image pacmanLeft = new Image("/images/pacman_left.png");
+	private final Image pacmanUp = new Image("/images/pacman_up.png");
+	private final Image pacmanDown = new Image("/images/pacman_down.png"); 
 	
 	public Pacman(Square square) {
 		super(square);
@@ -41,9 +41,9 @@ public class Pacman extends MovableObject {
 			}
 		}
 		boolean successfull = super.move(direction);
-
+		this.square.distance(0);
+		
 		if (successfull) {
-			this.square.distance(0);
 			subject.onNext(this);
 		}
 		return successfull;

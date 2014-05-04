@@ -2,6 +2,8 @@ package model;
 
 import java.awt.Point;
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Set;
 
 public class Game {
 	private Square[][] squares;
@@ -22,6 +24,41 @@ public class Game {
 		addHapper();
 		addBoxes();
 		addBlocks();
+
+		//calculate distances to pacman recursively starting at square (0,0)
+		pacman.getSquare().distance(0);
+				
+		//if there is no path from happer to pacman, reposition the boxes and blocks
+		//with a maximum of 5 tries
+		for(int i=0; i<5 && !pathExists(); i++) {
+			for(Box b : boxes) {
+				b.getSquare().setGameObject(null);
+			}
+			boxes.clear();
+			for(Block b : blocks) {
+				b.getSquare().setGameObject(null);
+			}
+			blocks.clear();
+			
+			addBoxes();
+			addBlocks();
+			
+			resetDistances();
+			pacman.getSquare().distance(0);
+		}
+	}
+	
+	//check if a path from happer to pacman exists
+	private boolean pathExists() {
+		boolean pathExists = false;
+		HashMap<Direction,Square> happerNeighbors = happer.getSquare().getNeighbors();
+		Set<Direction> set = happerNeighbors.keySet();
+		for (Direction d : set) {
+			if(happerNeighbors.get(d).getDistance() != Integer.MAX_VALUE) {
+				pathExists = true;
+			}
+		}
+		return pathExists;
 	}
 
 	private void createSquares() {
@@ -57,6 +94,23 @@ public class Game {
 			}
 		}
 	}
+	
+	public Square getRandomEmptySquare() {
+		int x, y;
+		do {
+			x = (int) (Math.random() * GameSettings.numberOfHorizontalSquares);
+			y = (int) (Math.random() * GameSettings.numberOfVerticalSquares);
+		} while (squares[x][y].hasGameObject() == true);
+		return squares[x][y];
+	}
+	
+	public void resetDistances() {
+        for (int x = 0; x < this.squares.length; x++) {
+            for (int y = 0; y < this.squares[x].length; y++) {
+                squares[x][y].resetDistance();
+            }
+        }
+    }
 
 	private void addBoxes() {
 		for (int i = 0; i < GameSettings.numberOfBoxes; i++) {
@@ -77,15 +131,6 @@ public class Game {
             square.setGameObject(block);
         }
     }
-
-	public Square getRandomEmptySquare() {
-		int x, y;
-		do {
-			x = (int) (Math.random() * GameSettings.numberOfHorizontalSquares);
-			y = (int) (Math.random() * GameSettings.numberOfVerticalSquares);
-		} while (squares[x][y].hasGameObject() == true);
-		return squares[x][y];
-	}
 
 	private void addPacman() {
 		Square square = squares[0][0];
@@ -114,4 +159,5 @@ public class Game {
 	public ArrayList<Block> getBlocks() {
 		return blocks;
 	}
+
 }

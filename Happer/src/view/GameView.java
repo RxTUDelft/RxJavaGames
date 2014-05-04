@@ -1,6 +1,5 @@
 package view;
 
-import javafx.geometry.Pos;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.image.ImageView;
@@ -8,8 +7,8 @@ import javafx.scene.layout.StackPane;
 import model.Block;
 import model.Box;
 import model.Game;
-import model.GameSettings;
 import model.GameObject;
+import model.GameSettings;
 import rx.Observer;
 
 public class GameView extends StackPane {
@@ -17,11 +16,12 @@ public class GameView extends StackPane {
 	Canvas canvas;
 
 	public GameView(Game game) {
-		setAlignment(Pos.TOP_LEFT);
 		this.game = game;
-
+		
+		setId("game");
+		
 		// draw grid
-		canvas = new Canvas(600, 600);
+		canvas = new Canvas(GameSettings.gameSize, GameSettings.gameSize);
 		if (GameSettings.grid) {
 			drawGrid();
 		}
@@ -81,6 +81,7 @@ public class GameView extends StackPane {
 			block.subscribe(gameObjectObserver);
 			this.getChildren().add(boxView);
 		}
+		
 	}
 
 	public void drawGrid() {

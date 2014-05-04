@@ -8,7 +8,7 @@ public class Block extends GameObject {
 	public Block(Square square) {
 		super(square);
 		
-		Image imgBlock = new Image(getClass().getResourceAsStream("/images/block.png"));
+		Image imgBlock = new Image("/images/block.png");
 		imageView = new ImageView(imgBlock);
 	}
 

@@ -1,5 +1,6 @@
 package view;
 
+import model.GameSettings;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.StackPane;
@@ -9,8 +10,10 @@ public class MainFrame extends HBox {
 	private StackPane rightPane;
 
 	public MainFrame() {
+		getStylesheets().add(getClass().getResource("Style.css").toExternalForm());
+
 		leftPane = new StackPane();
-		leftPane.setPrefSize(600, 600);
+		leftPane.setPrefSize(GameSettings.gameSize, GameSettings.gameSize);
 		setLeftPane(new StartScreen());
 		
 		rightPane = new StackPane();

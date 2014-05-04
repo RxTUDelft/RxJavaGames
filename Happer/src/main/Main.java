@@ -7,7 +7,6 @@ import javafx.stage.Stage;
 import view.MainFrame;
 
 public class Main extends Application {	
-	public static Scene scene;
 	
 	@Override
 	public void start(Stage primaryStage) throws Exception {
@@ -16,7 +15,7 @@ public class Main extends Application {
 		StackPane root = new StackPane();
 		root.getChildren().add(new MainFrame());
 		
-		scene = new Scene(root);
+		Scene scene = new Scene(root);
 		primaryStage.setScene(scene);		
 		primaryStage.show();
 	}
