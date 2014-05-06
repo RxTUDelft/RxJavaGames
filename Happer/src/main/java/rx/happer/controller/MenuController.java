@@ -20,26 +20,26 @@ public class MenuController {
 	}
 
 	public void addStartListener(Button btn) {
-		MouseObservables.mouseClick(btn).subscribe(event -> {
+		Observables.mouseClick(btn).subscribe(event -> {
 			startGame();
 		});
 	}
 
 	public void addStopListener(Button btn) {
-		MouseObservables.mouseClick(btn).subscribe(event -> {
+		Observables.mouseClick(btn).subscribe(event -> {
 			stopGame();
 		});
 	}
 
 	public void addRestartListener(Button btn) {
-		MouseObservables.mouseClick(btn).subscribe(event -> {
+		Observables.mouseClick(btn).subscribe(event -> {
 			stopGame();
 			startGame();
 		});
 	}
 
 	public void addSettingsListener(Button btn) {
-		MouseObservables.mouseClick(btn).subscribe(event -> {
+		Observables.mouseClick(btn).subscribe(event -> {
 			mainFrame.setLeftPane(new SettingsView());
 			setButtonsDisabled(false, false, true, true);
 		});

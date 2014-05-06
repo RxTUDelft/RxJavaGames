@@ -20,22 +20,22 @@ public class GameController {
 		arrowKeySubscriptions = new Subscription[4];
 		
 		// pacman key observables
-		arrowKeySubscriptions[0] = KeyObservables.rightArrowKey(gameView).subscribe(event -> {
+		arrowKeySubscriptions[0] = Observables.rightArrowKey(gameView).subscribe(event -> {
 			game.resetDistances();
 			game.getPacman().move(Direction.RIGHT);
 		});
 
-		arrowKeySubscriptions[1] = KeyObservables.leftArrowKey(gameView).subscribe(event -> {
+		arrowKeySubscriptions[1] = Observables.leftArrowKey(gameView).subscribe(event -> {
 			game.resetDistances();
 			game.getPacman().move(Direction.LEFT);
 		});
 
-		arrowKeySubscriptions[2] = KeyObservables.upArrowKey(gameView).subscribe(event -> {
+		arrowKeySubscriptions[2] = Observables.upArrowKey(gameView).subscribe(event -> {
 			game.resetDistances();
 			game.getPacman().move(Direction.UP);
 		});
 
-		arrowKeySubscriptions[3] = KeyObservables.downArrowKey(gameView).subscribe(event -> {
+		arrowKeySubscriptions[3] = Observables.downArrowKey(gameView).subscribe(event -> {
 			game.resetDistances();
 			game.getPacman().move(Direction.DOWN);
 		});
