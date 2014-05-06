@@ -10,7 +10,7 @@ public class MainFrame extends HBox {
 	private StackPane rightPane;
 
 	public MainFrame() {
-		getStylesheets().add(getClass().getResource("Style.css").toExternalForm());
+		getStylesheets().add(getClass().getResource("/Style.css").toExternalForm());
 
 		leftPane = new StackPane();
 		leftPane.setPrefSize(GameSettings.gameSize, GameSettings.gameSize);
