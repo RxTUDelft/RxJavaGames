@@ -30,17 +30,14 @@ public class Main extends Application {
 
 		// Bottom
 		Image bottomImg = new Image("ground.png");
-		double grassWidth = bottomImg.getWidth();
-		double grassHeight = bottomImg.getHeight();
-		int numberOfTiles = Double.valueOf(Math.ceil(screenWidth / grassWidth)).intValue();
+		double bottomWidth = bottomImg.getWidth();
+		double bottomHeight = bottomImg.getHeight();
+		int numberOfImgs = Double.valueOf(Math.ceil(screenWidth / bottomWidth)).intValue();
 
-		// Place tiles on bottom, spaced grassWidth apart
-		List<ImageView> grass = new ArrayList<>();
-		for (int i = 0; i < numberOfTiles; i++) {
+		for (int i = 0; i < numberOfImgs; i++) {
 			ImageView tile = new ImageView(bottomImg);
 			root.getChildren().add(tile);
-			tile.setTranslateX(i * grassWidth);
-			grass.add(tile);
+			tile.setTranslateX(i * bottomWidth);
 		}
 		
 		stage.setTitle("Flappy Bird");
