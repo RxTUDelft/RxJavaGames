@@ -19,7 +19,7 @@ import rx.pong.model.Direction;
 import rx.pong.model.Paddle;
 import rx.pong.model.PaddleState;
 import rx.pong.model.Score;
-import rx.pong.observables.FXObservable;
+import rx.pong.observables.PongObserverUtils;
 import rx.pong.ui.PongBackground;
 import rx.pong.ui.PongBall;
 import rx.pong.ui.PongBorder;
@@ -34,7 +34,7 @@ public class Main extends Application {
 	private static final int screenHeight = 600;
 
 	// observables
-	private final Observable<Integer> clock = FXObservable.clock(Main.frameRateMillis,
+	private final Observable<Integer> clock = PongObserverUtils.clock(Main.frameRateMillis,
 			TimeUnit.MILLISECONDS);
 
 	// model
@@ -107,7 +107,7 @@ public class Main extends Application {
 		root.getChildren().add(this.rightPaddleUI);
 		this.rightPaddleUI.setTranslateX(Main.screenWidth - this.rightPaddleUI.getWidth());
 
-		FXObservable.paddleController(scene, this.clock)
+		PongObserverUtils.paddleController(scene, this.clock)
 				.subscribe(new Observer<PaddleState>() {
 
 					@Override
@@ -135,16 +135,16 @@ public class Main extends Application {
 		});
 
 		// Ball interactions
-		Observable<Bounds> bottomBorderBounds = FXObservable.getBounds(this.clock, bottomBorder);
-		Observable<Bounds> topBorderBounds = FXObservable.getBounds(this.clock, topBorder);
-		Observable<Bounds> leftBorderBounds = FXObservable.getBounds(this.clock, leftBorder);
-		Observable<Bounds> rightBorderBounds = FXObservable.getBounds(this.clock, rightBorder);
-		Observable<Bounds> leftPaddleBounds = FXObservable.getBounds(this.clock, this.leftPaddleUI);
-		Observable<Bounds> rightPaddleBounds = FXObservable.getBounds(this.clock,
+		Observable<Bounds> bottomBorderBounds = PongObserverUtils.getBounds(this.clock, bottomBorder);
+		Observable<Bounds> topBorderBounds = PongObserverUtils.getBounds(this.clock, topBorder);
+		Observable<Bounds> leftBorderBounds = PongObserverUtils.getBounds(this.clock, leftBorder);
+		Observable<Bounds> rightBorderBounds = PongObserverUtils.getBounds(this.clock, rightBorder);
+		Observable<Bounds> leftPaddleBounds = PongObserverUtils.getBounds(this.clock, this.leftPaddleUI);
+		Observable<Bounds> rightPaddleBounds = PongObserverUtils.getBounds(this.clock,
 				this.rightPaddleUI);
-		Observable<Bounds> ballBounds = FXObservable.getBounds(this.clock, this.ballUI);
+		Observable<Bounds> ballBounds = PongObserverUtils.getBounds(this.clock, this.ballUI);
 
-		FXObservable.intersect(topBorderBounds, ballBounds)
+		PongObserverUtils.intersect(topBorderBounds, ballBounds)
 				.subscribe(hits -> {
 					if (!hits.get(0) || !hits.get(1)) {
 						this.ball = this.ball.changeDirection(Direction.RESTING, Direction.DOWN);
@@ -153,7 +153,7 @@ public class Main extends Application {
 					}
 				});
 
-		FXObservable.intersect(bottomBorderBounds, ballBounds)
+		PongObserverUtils.intersect(bottomBorderBounds, ballBounds)
 				.subscribe(hits -> {
 					if (!hits.get(0) || !hits.get(1)) {
 						this.ball = this.ball.changeDirection(Direction.RESTING, Direction.UP);
@@ -162,7 +162,7 @@ public class Main extends Application {
 					}
 				});
 
-		FXObservable.intersect(leftBorderBounds, ballBounds)
+		PongObserverUtils.intersect(leftBorderBounds, ballBounds)
 				.subscribe(hits -> {
 					if (!hits.get(0)) {
 						this.ball = new Ball(this.ball);
@@ -173,7 +173,7 @@ public class Main extends Application {
 					}
 				});
 
-		FXObservable.intersect(rightBorderBounds, ballBounds)
+		PongObserverUtils.intersect(rightBorderBounds, ballBounds)
 				.subscribe(hits -> {
 					if (!hits.get(0)) {
 						this.ball = new Ball(this.ball);
@@ -184,7 +184,7 @@ public class Main extends Application {
 					}
 				});
 
-		FXObservable.intersect(rightPaddleBounds, ballBounds)
+		PongObserverUtils.intersect(rightPaddleBounds, ballBounds)
 				.subscribe(hits -> {
 					if (!hits.get(0) || !hits.get(1)) {
 						this.ball = this.ball.changeDirection(Direction.DOWN, Direction.RESTING);
@@ -193,7 +193,7 @@ public class Main extends Application {
 					}
 				});
 
-		FXObservable.intersect(leftPaddleBounds, ballBounds)
+		PongObserverUtils.intersect(leftPaddleBounds, ballBounds)
 				.subscribe(hits -> {
 					if (!hits.get(0) || !hits.get(1)) {
 						this.ball = this.ball.changeDirection(Direction.UP, Direction.RESTING);

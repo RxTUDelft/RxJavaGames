@@ -127,7 +127,7 @@ public class Main extends Application {
 						new AudioClip(this.coinAudio).play();
 					}
 					if (!hits.get(1)) {
-						heart.setImage(starTile);
+						heart.setImage(heartTile);
 					}
 				});
 
