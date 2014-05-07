@@ -3,15 +3,14 @@ package rx.happer.controller;
 import java.util.concurrent.TimeUnit;
 
 import javafx.scene.input.KeyCode;
-import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.StackPane;
-import rx.functions.Action2;
-import rx.happer.model.Direction;
-import rx.happer.model.Game;
-import rx.happer.model.GameSettings;
 import rx.Observable;
 import rx.Observer;
 import rx.Subscription;
+import rx.functions.Action1;
+import rx.happer.model.Direction;
+import rx.happer.model.Game;
+import rx.happer.model.GameSettings;
 import rx.happer.view.GameView;
 import rx.happer.view.TextBox;
 
@@ -21,7 +20,7 @@ public class GameController {
 	
 	public GameController(Game game, GameView gameView) {
 		
-		Action2<KeyEvent, Direction> action = (event, dir) -> {
+		Action1<Direction> action = (dir) -> {
 			game.resetDistances();
 			game.getPacman().move(dir);
 		};
@@ -30,16 +29,16 @@ public class GameController {
 		
 		// pacman key observables
 		arrowKeySubscriptions[0] = Observables.keyPress(gameView, KeyCode.RIGHT)
-				.subscribe(event -> action.call(event, Direction.RIGHT));
+				.subscribe(event -> action.call(Direction.RIGHT));
 
 		arrowKeySubscriptions[1] = Observables.keyPress(gameView, KeyCode.LEFT)
-				.subscribe(event -> action.call(event, Direction.LEFT));
+				.subscribe(event -> action.call(Direction.LEFT));
 
 		arrowKeySubscriptions[2] = Observables.keyPress(gameView, KeyCode.UP)
-				.subscribe(event -> action.call(event, Direction.UP));
+				.subscribe(event -> action.call(Direction.UP));
 
 		arrowKeySubscriptions[3] = Observables.keyPress(gameView, KeyCode.DOWN)
-				.subscribe(event -> action.call(event, Direction.DOWN));
+				.subscribe(event -> action.call(Direction.DOWN));
 
 		// happer timer observable
 		Observable<Long> interval = Observable.interval(
