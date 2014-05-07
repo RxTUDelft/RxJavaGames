@@ -31,22 +31,25 @@ public class GameStateController implements Observer<GameState> {
 				TileUI oval = new TileUI();
 				oval.setImage(Images.OVAL);
 				this.ui.setContent(oval);
-				this.ui.setWinningTextVisible(false);
+				this.ui.setTextVisible(false);
 				break;
 			case TURN_X:
 				TileUI cross = new TileUI();
 				cross.setImage(Images.CROSS);
 				this.ui.setContent(cross);
-				this.ui.setWinningTextVisible(false);
+				this.ui.setTextVisible(false);
 				break;
 			case WON_O:
 				this.ui.setWinningText(Sprite.O);
-				this.ui.setWinningTextVisible(true);
+				this.ui.setTextVisible(true);
 				break;
 			case WON_X:
 				this.ui.setWinningText(Sprite.X);
-				this.ui.setWinningTextVisible(true);
+				this.ui.setTextVisible(true);
 				break;
+			case DRAW:
+				this.ui.setDrawText();
+				this.ui.setTextVisible(true);
 			default:
 				break;
 		}

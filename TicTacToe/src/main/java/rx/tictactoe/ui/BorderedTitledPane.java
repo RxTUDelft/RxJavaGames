@@ -13,7 +13,7 @@ import rx.tictactoe.model.Sprite;
 public class BorderedTitledPane extends GridPane {
 
 	private final StackPane contentPane = new StackPane();
-	private Label winningLabel = new Label("X has won!!!");
+	private Label finishLabel = new Label("X has won!!!");
 
 	public BorderedTitledPane(String titleString, Node content) {
 		Label titleLabel = new Label(" " + titleString + " ");
@@ -21,9 +21,9 @@ public class BorderedTitledPane extends GridPane {
 		titleLabel.setFont(Font.font("Arial", FontWeight.BOLD, 20));
 		StackPane.setAlignment(titleLabel, Pos.TOP_CENTER);
 		
-		this.winningLabel.setTranslateY(-50.0);
-		this.winningLabel.setFont(Font.font("Arial", FontWeight.BOLD, 20));
-		StackPane.setAlignment(this.winningLabel, Pos.TOP_CENTER);
+		this.finishLabel.setTranslateY(-50.0);
+		this.finishLabel.setFont(Font.font("Arial", FontWeight.BOLD, 20));
+		StackPane.setAlignment(this.finishLabel, Pos.TOP_CENTER);
 
 		this.contentPane.setStyle("-fx-content-display: top;\n"
 				+ "-fx-border-insets: 20 15 15 15;\n"
@@ -33,7 +33,7 @@ public class BorderedTitledPane extends GridPane {
 		
 		this.setPadding(new Insets(26, 10, 10, 10));
 		this.add(titleLabel, 1, 0);
-		this.add(this.winningLabel, 1, 0);
+		this.add(this.finishLabel, 1, 0);
 		this.add(this.contentPane, 0, 1, 3, 1);
 	}
 	
@@ -42,10 +42,14 @@ public class BorderedTitledPane extends GridPane {
 	}
 	
 	public void setWinningText(Sprite sprite) {
-		this.winningLabel.setText(sprite.name() + " has won!!!");
+		this.finishLabel.setText(sprite.name() + " has won!!!");
 	}
 	
-	public void setWinningTextVisible(boolean flag) {
-		this.winningLabel.setVisible(flag);
+	public void setDrawText() {
+		this.finishLabel.setText("Draw!!!");
+	}
+	
+	public void setTextVisible(boolean flag) {
+		this.finishLabel.setVisible(flag);
 	}
 }
