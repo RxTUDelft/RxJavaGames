@@ -22,12 +22,16 @@ public class Game extends Observable<GameState> implements IGameStateManager {
 		this.board = board;
 
 		this.turn = this.determineFirst();
-		this.gameState = this.turn == Sprite.X ? GameState.TURN_X : GameState.TURN_O;
+		this.gameState = this.spriteToGameState(this.turn);
 		this.subject = subject;
 	}
 	
 	private Sprite determineFirst() {
 		return new Random().nextBoolean() ? Sprite.X : Sprite.O;
+	}
+	
+	private GameState spriteToGameState(Sprite s) {
+		return s == Sprite.X ? GameState.TURN_X : GameState.TURN_O;
 	}
 	
 	public Board getBoard() {
@@ -74,6 +78,10 @@ public class Game extends Observable<GameState> implements IGameStateManager {
 				this.gameState = GameState.TURN_O;
 				this.turn = Sprite.O;
 				break;
+			case DRAW:
+				this.turn = this.determineFirst();
+				this.gameState = this.spriteToGameState(this.turn);
+				break;
 			default:
 				break;
 		}
@@ -92,6 +100,12 @@ public class Game extends Observable<GameState> implements IGameStateManager {
 			default:
 				throw new IllegalArgumentException("Sprite " + sprite + " is not allowed here!");
 		}
+		this.subject.onNext(this.gameState);
+	}
+
+	@Override
+	public void draw() {
+		this.gameState = GameState.DRAW;
 		this.subject.onNext(this.gameState);
 	}
 }

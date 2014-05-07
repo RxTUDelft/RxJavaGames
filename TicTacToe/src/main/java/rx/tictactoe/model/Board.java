@@ -103,4 +103,8 @@ public class Board extends Observable<Tile> {
 		}
 		return Optional.empty();
 	}
+	
+	public boolean isFull() {
+		return this.tiles.stream().allMatch(list -> list.stream().allMatch(tile -> tile.getSprite().isPresent()));
+	}
 }

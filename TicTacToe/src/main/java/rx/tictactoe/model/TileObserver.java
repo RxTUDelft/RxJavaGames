@@ -25,9 +25,18 @@ public class TileObserver implements Observer<Tile> {
 
 	@Override
 	public void onNext(Tile t) {
-		t.getSprite()
-				.ifPresent(sprite -> this.detectWinningChain(t)
-						.ifPresent(set -> this.game.wonBy(sprite)));
+		Optional<Sprite> sprite = t.getSprite();
+		if (sprite.isPresent()) {
+			Optional<Set<Tile>> chain = this.detectWinningChain(t);
+			if (chain.isPresent()) {
+				this.game.wonBy(sprite.get());
+			}
+			else {
+				if (t.getSprite().map(s -> this.detectFullBoard()).orElse(false)) {
+					this.game.draw();
+				}
+			}
+		}
 	}
 
 	private Optional<Set<Tile>> detectWinningChain(Tile t) {
@@ -54,5 +63,9 @@ public class TileObserver implements Observer<Tile> {
 		}
 
 		return Optional.empty();
+	}
+	
+	private boolean detectFullBoard() {
+		return this.game.getBoard().isFull();
 	}
 }
