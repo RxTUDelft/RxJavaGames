@@ -41,12 +41,11 @@ public class Game extends Observable<GameState> implements IGameStateManager {
 	public void performMove(int x, int y) {
 		if (this.gameState == GameState.TURN_X
 				|| this.gameState == GameState.TURN_O) {
-			this.board.set(this.turn, x, y);
-		}
-		
-		if (this.gameState == GameState.TURN_X
-				|| this.gameState == GameState.TURN_O) {
-			this.switchTurns();
+			boolean res = this.board.set(this.turn, x, y);
+			if (res && (this.gameState == GameState.TURN_X
+					|| this.gameState == GameState.TURN_O)) {
+				this.switchTurns();
+			}
 		}
 	}
 
