@@ -35,20 +35,8 @@ public enum Observables { ;//no class instances
 		});
 	}
 	
-	public static Observable<KeyEvent> rightArrowKey(Node node) {
-		return keyPress(node).filter(event -> event.getCode() == KeyCode.RIGHT);
-	}
-	
-	public static Observable<KeyEvent> leftArrowKey(Node node) {
-		return keyPress(node).filter(event -> event.getCode() == KeyCode.LEFT);
-	}
-	
-	public static Observable<KeyEvent> upArrowKey(Node node) {
-		return keyPress(node).filter(event -> event.getCode() == KeyCode.UP);
-	}
-	
-	public static Observable<KeyEvent> downArrowKey(Node node) {
-		return keyPress(node).filter(event -> event.getCode() == KeyCode.DOWN);
+	public static Observable<KeyEvent> keyPress(Node node, KeyCode keyCode) {
+		return keyPress(node).filter(event -> event.getCode() == keyCode);
 	}
 	
 	public static Observable<MouseEvent> mouseClick(Node node) {

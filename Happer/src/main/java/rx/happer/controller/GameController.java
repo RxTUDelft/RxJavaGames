@@ -2,7 +2,10 @@ package rx.happer.controller;
 
 import java.util.concurrent.TimeUnit;
 
+import javafx.scene.input.KeyCode;
+import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.StackPane;
+import rx.functions.Action2;
 import rx.happer.model.Direction;
 import rx.happer.model.Game;
 import rx.happer.model.GameSettings;
@@ -17,37 +20,33 @@ public class GameController {
 	private Subscription[] arrowKeySubscriptions;
 	
 	public GameController(Game game, GameView gameView) {
+		
+		Action2<KeyEvent, Direction> action = (event, dir) -> {
+			game.resetDistances();
+			game.getPacman().move(dir);
+		};
+		
 		arrowKeySubscriptions = new Subscription[4];
 		
 		// pacman key observables
-		arrowKeySubscriptions[0] = Observables.rightArrowKey(gameView).subscribe(event -> {
-			game.resetDistances();
-			game.getPacman().move(Direction.RIGHT);
-		});
+		arrowKeySubscriptions[0] = Observables.keyPress(gameView, KeyCode.RIGHT)
+				.subscribe(event -> action.call(event, Direction.RIGHT));
 
-		arrowKeySubscriptions[1] = Observables.leftArrowKey(gameView).subscribe(event -> {
-			game.resetDistances();
-			game.getPacman().move(Direction.LEFT);
-		});
+		arrowKeySubscriptions[1] = Observables.keyPress(gameView, KeyCode.LEFT)
+				.subscribe(event -> action.call(event, Direction.LEFT));
 
-		arrowKeySubscriptions[2] = Observables.upArrowKey(gameView).subscribe(event -> {
-			game.resetDistances();
-			game.getPacman().move(Direction.UP);
-		});
+		arrowKeySubscriptions[2] = Observables.keyPress(gameView, KeyCode.UP)
+				.subscribe(event -> action.call(event, Direction.UP));
 
-		arrowKeySubscriptions[3] = Observables.downArrowKey(gameView).subscribe(event -> {
-			game.resetDistances();
-			game.getPacman().move(Direction.DOWN);
-		});
+		arrowKeySubscriptions[3] = Observables.keyPress(gameView, KeyCode.DOWN)
+				.subscribe(event -> action.call(event, Direction.DOWN));
 
 		// happer timer observable
 		Observable<Long> interval = Observable.interval(
 				GameSettings.happerSpeed, TimeUnit.MILLISECONDS).observeOn(
 				FXScheduler.getInstance());
 
-		intervalSubscription = interval.subscribe(event -> {
-			game.getHapper().move();
-		});
+		intervalSubscription = interval.subscribe(event -> game.getHapper().move());
 
 		// end game observable
 		Observer<Boolean> endGameObserver = new Observer<Boolean>() {
