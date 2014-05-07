@@ -1,10 +1,10 @@
 package rx.tictactoe.controller;
 
-import javafx.scene.input.MouseEvent;
+import javafx.event.ActionEvent;
 import rx.Observer;
 import rx.tictactoe.model.IGameStateManager;
 
-public class RestartButtonController implements Observer<MouseEvent> {
+public class RestartButtonController implements Observer<ActionEvent> {
 
 	private IGameStateManager gameState;
 
@@ -22,7 +22,7 @@ public class RestartButtonController implements Observer<MouseEvent> {
 	}
 
 	@Override
-	public void onNext(MouseEvent t) {
+	public void onNext(ActionEvent t) {
 		this.gameState.startNewGame();
 	}
 }

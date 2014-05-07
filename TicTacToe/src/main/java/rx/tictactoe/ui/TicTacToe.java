@@ -40,8 +40,8 @@ public class TicTacToe extends Application {
 	@Override
 	public void start(Stage stage) {
 		this.board.subscribe(this.to);
-		FXObservable.mouseClick(this.restartButton).subscribe(this.restartController);
-		FXObservable.mouseClick(this.quitButton).subscribe(this.closeController);
+		FXObservable.actionEvent(this.restartButton).subscribe(this.restartController);
+		FXObservable.actionEvent(this.quitButton).subscribe(this.closeController);
 		this.game.startWith(this.game.getGameState()).subscribe(this.gameStateController);
 		this.board.subscribe(this.boardController);
 		
