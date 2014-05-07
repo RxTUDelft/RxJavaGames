@@ -1,9 +1,9 @@
 package rx.tictactoe.controller;
 
-import javafx.scene.input.MouseEvent;
+import javafx.event.ActionEvent;
 import rx.Observer;
 
-public class CloseButtonController implements Observer<MouseEvent> {
+public class CloseButtonController implements Observer<ActionEvent> {
 
 	@Override
 	public void onCompleted() {
@@ -15,7 +15,7 @@ public class CloseButtonController implements Observer<MouseEvent> {
 	}
 
 	@Override
-	public void onNext(MouseEvent t) {
+	public void onNext(ActionEvent t) {
 		System.exit(0);
 	}
 }

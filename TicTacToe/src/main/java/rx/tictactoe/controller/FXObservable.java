@@ -1,5 +1,6 @@
 package rx.tictactoe.controller;
 
+import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.scene.Node;
 import javafx.scene.input.MouseEvent;
@@ -17,6 +18,16 @@ public enum FXObservable {
 
 			subscriber.add(Subscriptions.create(() -> node.removeEventHandler(
 					MouseEvent.MOUSE_CLICKED, handler)));
+		});
+	}
+
+	public static Observable<ActionEvent> actionEvent(Node node) {
+		return Observable.create((Subscriber<? super ActionEvent> subscriber) -> {
+			EventHandler<ActionEvent> handler = (event) -> subscriber.onNext(event);
+			node.addEventHandler(ActionEvent.ACTION, handler);
+
+			subscriber.add(Subscriptions.create(() -> node.removeEventHandler(
+					ActionEvent.ACTION, handler)));
 		});
 	}
 }
