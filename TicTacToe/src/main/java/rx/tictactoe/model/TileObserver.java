@@ -7,7 +7,7 @@ import java.util.function.Predicate;
 import rx.Observer;
 
 public class TileObserver implements Observer<Tile> {
-	
+
 	private final Game game;
 
 	public TileObserver(Game game) {
@@ -25,18 +25,17 @@ public class TileObserver implements Observer<Tile> {
 
 	@Override
 	public void onNext(Tile t) {
-		Optional<Sprite> sprite = t.getSprite();
-		if (sprite.isPresent()) {
+		t.getSprite().ifPresent(sprite -> {
 			Optional<Set<Tile>> chain = this.detectWinningChain(t);
-			if (chain.isPresent()) {
-				this.game.wonBy(sprite.get());
-			}
-			else {
-				if (t.getSprite().map(s -> this.detectFullBoard()).orElse(false)) {
-					this.game.draw();
-				}
-			}
-		}
+			chain.ifPresent(set -> this.game.wonBy(sprite));
+			t.getSprite()
+					.map(s -> this.detectDraw(t))
+					.ifPresent(b -> {
+						if (b) {
+							this.game.draw();
+						}
+					});
+		});
 	}
 
 	private Optional<Set<Tile>> detectWinningChain(Tile t) {
@@ -64,8 +63,8 @@ public class TileObserver implements Observer<Tile> {
 
 		return Optional.empty();
 	}
-	
-	private boolean detectFullBoard() {
-		return this.game.getBoard().isFull();
+
+	private boolean detectDraw(Tile t) {
+		return this.game.getBoard().isFull() && !this.detectWinningChain(t).isPresent();
 	}
 }
