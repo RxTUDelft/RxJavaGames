@@ -99,6 +99,13 @@ public class Main extends Application {
 						}
 					}));
 
+		// Flappy
+		Image flappyImg = new Image("Flappy.gif");
+		ImageView flappy = new ImageView(flappyImg);
+		root.getChildren().add(flappy);
+		flappy.setTranslateY(-screenHeight / 2);
+		flappy.setTranslateX(screenWidth / 4 - flappyImg.getWidth() / 2);
+
 		stage.setTitle("Flappy Bird");
 		stage.setScene(scene);
 		stage.show();
