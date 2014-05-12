@@ -26,7 +26,7 @@ public class Main extends Application {
 		Scene scene = new Scene(root, screenWidth, screenHeight);
 
 		// time
-		Observable<Integer> clock = Observable.timer(0, 16, TimeUnit.MILLISECONDS)
+		Observable<Integer> clock = Observable.timer(0, 10, TimeUnit.MILLISECONDS)
 				.map(x -> 1)
 				.observeOn(new FxScheduler());
 
