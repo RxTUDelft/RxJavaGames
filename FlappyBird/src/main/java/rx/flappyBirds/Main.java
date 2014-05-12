@@ -30,6 +30,10 @@ public class Main extends Application {
 				.map(x -> 1)
 				.observeOn(new FxScheduler());
 
+		// Constants
+		double gravity = 0.1;
+		double jumpSpeed = 8.0;
+
 		// Background
 		Image bgImg = new Image("background.png");
 		ImageView background = new ImageView(bgImg);
@@ -39,6 +43,7 @@ public class Main extends Application {
 		// Bottom
 		Image bottomImg = new Image("ground.png");
 		double bottomWidth = bottomImg.getWidth();
+		double bottomHeight = bottomImg.getHeight();
 		int numberOfImgs = Double.valueOf(Math.ceil(screenWidth / bottomWidth)).intValue() + 1;
 
 		List<ImageView> bottom = new ArrayList<>();
@@ -103,8 +108,13 @@ public class Main extends Application {
 		Image flappyImg = new Image("Flappy.gif");
 		ImageView flappy = new ImageView(flappyImg);
 		root.getChildren().add(flappy);
-		flappy.setTranslateY(-screenHeight / 2);
+		double flappyInitY = -screenHeight / 2;
 		flappy.setTranslateX(screenWidth / 4 - flappyImg.getWidth() / 2);
+		flappy.setTranslateY(flappyInitY);
+		
+		Observable<Double> velocity = clock.scan(jumpSpeed, (v, i) -> v - gravity);
+		Observable<Double> yPos = velocity.scan(flappyInitY, (y, dv) -> y - dv);
+		yPos.filter(y -> y < -bottomHeight).subscribe(y -> flappy.setTranslateY(y));
 
 		stage.setTitle("Flappy Bird");
 		stage.setScene(scene);
