@@ -10,6 +10,7 @@ import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
+import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.StackPane;
 import javafx.stage.Stage;
 import rx.Observable;
@@ -32,7 +33,7 @@ public class Main extends Application {
 
 		// Constants
 		double gravity = 0.1;
-		double jumpSpeed = 8.0;
+		double impuls = 4;
 
 		// Background
 		Image bgImg = new Image("background.png");
@@ -86,7 +87,7 @@ public class Main extends Application {
 			pipes.add(new ImageView[] { pipeUp, pipeDown });
 		}
 
-		clock.map(i -> 1).subscribe(v ->
+		clock.map(i -> 2).subscribe(v ->
 				pipes.stream().forEach(array -> {
 					ImageView up = array[0];
 					ImageView down = array[1];
@@ -112,9 +113,11 @@ public class Main extends Application {
 		flappy.setTranslateX(screenWidth / 4 - flappyImg.getWidth() / 2);
 		flappy.setTranslateY(flappyInitY);
 		
-		Observable<Double> velocity = clock.scan(jumpSpeed, (v, i) -> v - gravity);
-		Observable<Double> yPos = velocity.scan(flappyInitY, (y, dv) -> y - dv);
-		yPos.filter(y -> y < -bottomHeight).subscribe(y -> flappy.setTranslateY(y));
+		Observable<List<KeyEvent>> spaceBarEvents = SpacebarObservable.spaceBar(scene).buffer(clock);
+		Observable<Boolean> impulsForce = spaceBarEvents.map(list -> !list.isEmpty());
+		Observable<Double> velocity = impulsForce.scan(0.0, (vOld, i) -> i ? impuls : vOld - gravity);
+		Observable<Double> yPos = velocity.scan(flappyInitY, (yOld, dv) -> Math.min(yOld - dv, -bottomHeight));
+		yPos.subscribe(y -> flappy.setTranslateY(y));
 
 		stage.setTitle("Flappy Bird");
 		stage.setScene(scene);
