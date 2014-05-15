@@ -15,6 +15,8 @@ import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.StackPane;
+import javafx.scene.paint.Color;
+import javafx.scene.shape.Line;
 import javafx.stage.Stage;
 import rx.Observable;
 import rx.functions.Func1;
@@ -111,17 +113,25 @@ public class Main extends Application {
 
 		// Flappy
 		Image flappyImg = new Image("Flappy.gif");
+		Image flappyBoundImg = new Image("FlappyBounding.png");
 		ImageView flappy = new ImageView(flappyImg);
+		ImageView flappyB = new ImageView(flappyBoundImg);
+		root.getChildren().add(flappyB);
 		root.getChildren().add(flappy);
 		double flappyInitY = -screenHeight / 2;
 		flappy.setTranslateX(screenWidth / 4 - flappyImg.getWidth() / 2);
-		flappy.setTranslateY(flappyInitY);
+		flappyB.setTranslateX(36 + screenWidth / 4 - flappyImg.getWidth() / 2);
+		flappyB.setScaleX(0.9);
+		flappyB.setScaleY(0.9);
 		
 		Observable<List<KeyEvent>> spaceBarEvents = SpacebarObservable.spaceBar(scene).buffer(clock);
 		Observable<Boolean> impulsForce = spaceBarEvents.map(list -> !list.isEmpty());
 		Observable<Double> velocity = impulsForce.scan(0.0, (vOld, i) -> i ? impuls : vOld - gravity);
 		Observable<Double> yPos = velocity.scan(flappyInitY, (yOld, dv) -> Math.min(yOld - dv, -bottomHeight));
-		yPos.subscribe(y -> flappy.setTranslateY(y));
+		yPos.subscribe(y -> {
+			flappy.setTranslateY(y);
+			flappyB.setTranslateY(y);
+		});
 		
 		// Collision detection
 		Func1<ImageView, Observable<Bounds>> func1 = iv -> clock.map(i -> iv.localToScene(iv.getLayoutBounds()));
@@ -130,7 +140,7 @@ public class Main extends Application {
 				.map(iv -> func1.call(iv))
 				.collect(Collectors.toList());
 		
-		Observable<Bounds> flappyBounds = clock.map(i -> flappy.localToScene(flappy.getLayoutBounds()));
+		Observable<Bounds> flappyBounds = clock.map(i -> flappyB.localToScene(flappyB.getLayoutBounds()));
 		
 		pipeBounds.stream()
 				.forEach(pipeBound ->
