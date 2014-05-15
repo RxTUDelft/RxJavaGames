@@ -18,11 +18,7 @@ public enum SpacebarObservable { ;//no class instances
 			subscriber.add(Subscriptions.create(() -> scene.removeEventHandler(KeyEvent.KEY_PRESSED, handler)));
 		});
 	}
-	
-	public static Observable<KeyEvent> enterKey(Scene scene) {
-		return keyPress(scene).filter(event -> event.getCode() == KeyCode.ENTER);
-	}
-	
+
 	public static Observable<KeyEvent> spaceBar(Scene scene) {
 		return keyPress(scene).filter(event -> event.getCode() == KeyCode.SPACE);
 	}
