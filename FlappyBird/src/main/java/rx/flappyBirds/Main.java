@@ -1,11 +1,14 @@
 package rx.flappyBirds;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Random;
 import java.util.concurrent.TimeUnit;
+import java.util.stream.Collectors;
 
 import javafx.application.Application;
+import javafx.geometry.Bounds;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.image.Image;
@@ -14,6 +17,7 @@ import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.StackPane;
 import javafx.stage.Stage;
 import rx.Observable;
+import rx.functions.Func1;
 
 public class Main extends Application {
 
@@ -118,6 +122,26 @@ public class Main extends Application {
 		Observable<Double> velocity = impulsForce.scan(0.0, (vOld, i) -> i ? impuls : vOld - gravity);
 		Observable<Double> yPos = velocity.scan(flappyInitY, (yOld, dv) -> Math.min(yOld - dv, -bottomHeight));
 		yPos.subscribe(y -> flappy.setTranslateY(y));
+		
+		// Collision detection
+		Func1<ImageView, Observable<Bounds>> func1 = iv -> clock.map(i -> iv.localToScene(iv.getLayoutBounds()));
+		List<Observable<Bounds>> pipeBounds = pipes.stream()
+				.flatMap(ivs -> Arrays.stream(ivs))
+				.map(iv -> func1.call(iv))
+				.collect(Collectors.toList());
+		
+		Observable<Bounds> flappyBounds = clock.map(i -> flappy.localToScene(flappy.getLayoutBounds()));
+		
+		pipeBounds.stream()
+				.forEach(pipeBound ->
+						Observable.combineLatest(pipeBound, flappyBounds, (p, f) -> p.intersects(f))
+								.buffer(2, 1)
+								.filter(hits -> hits.get(0) != hits.get(1))
+								.subscribe(hits -> {
+									if (!hits.get(0)) {
+										System.out.println("LOST!!!");
+									}
+								}));
 
 		stage.setTitle("Flappy Bird");
 		stage.setScene(scene);
