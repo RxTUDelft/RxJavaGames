@@ -1,0 +1,36 @@
+#gameView {
+	-fx-pref-height:600px;
+	-fx-pref-width:800px;
+	-fx-background-color: black;
+}
+
+#humanPlayerHand {
+	-fx-background-color:blue;
+	-fx-alignment: center-left;
+}
+
+#computerPlayerHand {
+	-fx-background-color: lightblue ;
+	-fx-alignment: center-left;
+}
+
+#playerCard {
+	-fx-cursor: hand;
+}
+
+#piles {
+	-fx-alignment: center;
+	-fx-spacing: 20px;
+}
+
+#stockPile {
+	-fx-cursor: hand;
+}
+
+#menu {
+	-fx-background-color: rgb(255,255,128);
+	-fx-max-height: 40px;
+	-fx-padding: 10px;
+	-fx-font-family: "Verdana";
+	-fx-font-size: 12pt;
+}
