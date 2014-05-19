@@ -17,9 +17,11 @@ import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.StackPane;
+import javafx.scene.media.AudioClip;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Line;
 import javafx.scene.text.Font;
+import javafx.scene.text.FontWeight;
 import javafx.stage.Stage;
 import rx.Observable;
 import rx.Subscription;
@@ -29,6 +31,11 @@ import rx.subjects.BehaviorSubject;
 public class Main extends Application {
 
 	private int score = 0;
+
+	private final String jumpAudio = this.getClass().getResource("/jump.wav").toString();
+	private final String lostAudio = this.getClass().getResource("/lost.wav").toString();
+	private final String scoreAudio = this.getClass().getResource("/score.wav").toString();
+	private final String startAudio = this.getClass().getResource("/start.wav").toString();
 
 	@Override
 	public void start(Stage stage) {
@@ -40,14 +47,14 @@ public class Main extends Application {
 		Scene scene = new Scene(root, screenWidth, screenHeight);
 
 		// time
-		Observable<Integer> clock = Observable.timer(0, 10, TimeUnit.MILLISECONDS)
+		Observable<Integer> clock = Observable.timer(500, 10, TimeUnit.MILLISECONDS)
 				.map(x -> 1)
 				.observeOn(new FxScheduler());
 		BehaviorSubject<Integer> scoreObservable = BehaviorSubject.create(this.score);
 
 		// Constants
 		double gravity = 0.1;
-		double impuls = 4;
+		double impuls = 4.0;
 
 		// Background
 		Image bgImg = new Image("background.png");
@@ -69,16 +76,17 @@ public class Main extends Application {
 			bottom.add(tile);
 		}
 
-		Subscription bottomSubscription = clock.map(i -> 1).subscribe(v ->
-				bottom.stream().forEach(tile -> {
-					double translateX = tile.getTranslateX();
-					if (translateX <= -bottomWidth) {
-						tile.setTranslateX(screenWidth - v);
-					}
-						else {
-							tile.setTranslateX(translateX - v);
-						}
-					}));
+		Subscription bottomSubscription = clock.map(i -> 1)
+				.subscribe(v ->
+    				bottom.stream().forEach(tile -> {
+    					double translateX = tile.getTranslateX();
+    					if (translateX <= -bottomWidth) {
+    						tile.setTranslateX(screenWidth - v);
+    					}
+    					else {
+    						tile.setTranslateX(translateX - v);
+    					}
+    				}));
 
 		// Pipes
 		Image pipeImg = new Image("pipe.png");
@@ -101,18 +109,19 @@ public class Main extends Application {
 			pipes.add(new ImageView[] { pipeUp, pipeDown });
 		}
 
-		Subscription pipeSubscription = clock.map(i -> 2).subscribe(v ->
-				pipes.stream().forEach(array -> {
-					ImageView up = array[0];
-					ImageView down = array[1];
-					double dx = up.getTranslateX();
-					if (dx <= -pipeWidth) {
-						up.setTranslateX(3 * pipeDist - pipeWidth);
-						down.setTranslateX(3 * pipeDist - pipeWidth);
-						int h = heights[random.nextInt(heights.length)];
-						up.setTranslateY(h - screenHeight);
-						down.setTranslateY(h - screenHeight / 8);
-					}
+		Subscription pipeSubscription = clock.map(i -> 2)
+				.subscribe(v ->
+    				pipes.stream().forEach(array -> {
+    					ImageView up = array[0];
+    					ImageView down = array[1];
+    					double dx = up.getTranslateX();
+    					if (dx <= -pipeWidth) {
+    						up.setTranslateX(3 * pipeDist - pipeWidth);
+    						down.setTranslateX(3 * pipeDist - pipeWidth);
+    						int h = heights[random.nextInt(heights.length)];
+    						up.setTranslateY(h - screenHeight);
+    						down.setTranslateY(h - screenHeight / 8);
+    					}
 						else {
 							up.setTranslateX(dx - v);
 							down.setTranslateX(dx - v);
@@ -129,12 +138,13 @@ public class Main extends Application {
 			lines.add(line);
 		}
 
-		Subscription scoreLineSubscription = clock.map(i -> 2).subscribe(v ->
-				lines.stream().forEach(line -> {
-					double dx = line.getTranslateX();
-					if (dx <= pipeWidth) {
-						line.setTranslateX(3 * pipeDist + pipeWidth);
-					}
+		Subscription scoreLineSubscription = clock.map(i -> 2)
+				.subscribe(v ->
+    				lines.stream().forEach(line -> {
+    					double dx = line.getTranslateX();
+    					if (dx <= pipeWidth) {
+    						line.setTranslateX(3 * pipeDist + pipeWidth);
+    					}
 						else {
 							line.setTranslateX(dx - v);
 						}
@@ -154,10 +164,11 @@ public class Main extends Application {
 		flappyB.setScaleY(0.95);
 
 		Observable<List<KeyEvent>> spaceBarEvents = SpacebarObservable.spaceBar(scene)
+				.doOnEach(event -> new AudioClip(this.jumpAudio).play())
 				.buffer(clock);
 		Observable<Boolean> impulsForce = spaceBarEvents.map(list -> !list.isEmpty());
-		Observable<Double> velocity = impulsForce.scan(0.0, (vOld, b) -> b ? impuls : vOld
-				- gravity);
+		Observable<Double> velocity = impulsForce.scan(0.0,
+				(vOld, b) -> b ? impuls : vOld - gravity);
 		Observable<Double> yPos = velocity.scan(flappyInitY,
 				(yOld, dv) -> Math.min(yOld - dv, -bottomHeight));
 		Subscription flappySubscription = yPos.subscribe(y -> {
@@ -170,71 +181,72 @@ public class Main extends Application {
 		root.getChildren().add(label);
 		StackPane.setMargin(label, new Insets(20, 0, 0, 0));
 		StackPane.setAlignment(label, Pos.TOP_CENTER);
-		label.setFont(Font.font("Verdana", 50));
+		label.setFont(Font.font("Tohama", FontWeight.BOLD, 50));
 		label.setTextFill(Color.BLACK);
 		label.setPadding(new Insets(5));
-		label.setStyle("-fx-background-color: rgba(255, 255, 0, 0.5);");
-		Subscription scoreSubscription = scoreObservable.subscribe(i -> label.setText("" + i));
+		Subscription scoreSubscription = scoreObservable.subscribe(i ->
+				label.setText("score: " + i));
 
 		// Collision detection
-		Func1<ImageView, Observable<Bounds>> func1Pipes = iv -> clock.map(i -> iv.localToScene(iv
-				.getLayoutBounds()));
+		Func1<ImageView, Observable<Bounds>> func1Pipes = iv -> clock.map(i ->
+				iv.localToScene(iv.getLayoutBounds()));
 		List<Observable<Bounds>> pipeBounds = pipes.stream()
 				.flatMap(ivs -> Arrays.stream(ivs))
 				.map(iv -> func1Pipes.call(iv))
 				.collect(Collectors.toList());
 
-		Func1<Line, Observable<Bounds>> func1Lines = line -> clock.map(i -> line.localToScene(line
-				.getLayoutBounds()));
+		Func1<Line, Observable<Bounds>> func1Lines = line -> clock.map(i ->
+				line.localToScene(line.getLayoutBounds()));
 		List<Observable<Bounds>> lineBounds = lines.stream()
 				.map(line -> func1Lines.call(line))
 				.collect(Collectors.toList());
 
-		Observable<Bounds> flappyBounds = clock.map(i -> flappyB.localToScene(flappyB
-				.getLayoutBounds()));
+		Observable<Bounds> flappyBounds = clock.map(i ->
+				flappyB.localToScene(flappyB.getLayoutBounds()));
 
-		pipeBounds
-				.stream()
-				.forEach(
-						pipeBound -> Observable
-								.combineLatest(pipeBound, flappyBounds, (p, f) -> p.intersects(f))
-								.buffer(2, 1)
-								.filter(hits -> hits.get(0) != hits.get(1))
-								.subscribe(
-										hits -> {
-											if (!hits.get(0)) {
-												bottomSubscription.unsubscribe();
-												pipeSubscription.unsubscribe();
-												scoreLineSubscription.unsubscribe();
-												flappySubscription.unsubscribe();
-												scoreSubscription.unsubscribe();
+		pipeBounds.stream()
+				.forEach(pipeBound -> Observable
+						.combineLatest(pipeBound, flappyBounds, (p, f) -> p.intersects(f))
+						.buffer(2, 1)
+						.filter(hits -> hits.get(0) != hits.get(1))
+						.subscribe(hits -> {
+							if (!hits.get(0)) {
+								bottomSubscription.unsubscribe();
+								pipeSubscription.unsubscribe();
+								scoreLineSubscription.unsubscribe();
+								flappySubscription.unsubscribe();
+								scoreSubscription.unsubscribe();
 
-												StackPane lostPane = new StackPane();
-												root.getChildren().add(lostPane);
-												lostPane.setStyle("-fx-background-color: rgba(255, 255, 255, 0.5);");
+								new AudioClip(this.lostAudio).play();
 
-												Label lostLabel = new Label("Lost");
-												lostPane.getChildren().add(lostLabel);
-												lostLabel
-														.setStyle("-fx-background-color: rgb(255,128,64);");
-												lostLabel.setFont(Font.font("Tohama", 50));
-												lostLabel.setPadding(new Insets(5, 10, 5, 10));
-												lostLabel.setTextFill(Color.BLACK);
-											}
-										}));
+								StackPane lostPane = new StackPane();
+								root.getChildren().add(lostPane);
+								lostPane.setStyle("-fx-background-color: rgba(255, 255, 255, 0.5);");
+
+								Label lostLabel = new Label("GAME OVER!!!");
+								lostPane.getChildren().add(lostLabel);
+								lostLabel
+										.setStyle("-fx-background-color: rgb(255,128,64);");
+								lostLabel.setFont(Font.font("Tohama",
+										FontWeight.BOLD, 50));
+								lostLabel.setPadding(new Insets(5, 10, 5, 10));
+								lostLabel.setTextFill(Color.BLACK);
+							}
+						}));
 
 		lineBounds.stream()
-				.forEach(
-						line -> Observable
-								.combineLatest(line, flappyBounds, (l, f) -> l.intersects(f))
-								.buffer(2, 1)
-								.filter(hits -> hits.get(0) != hits.get(1))
-								.subscribe(hits -> {
-									if (!hits.get(0)) {
-										scoreObservable.onNext(++this.score);
-									}
-								}));
+				.forEach(line -> Observable
+						.combineLatest(line, flappyBounds, (l, f) -> l.intersects(f))
+						.buffer(2, 1)
+						.filter(hits -> hits.get(0) != hits.get(1))
+						.subscribe(hits -> {
+							if (!hits.get(0)) {
+								scoreObservable.onNext(++this.score);
+								new AudioClip(this.scoreAudio).play();
+							}
+						}));
 
+		stage.setOnShown(event -> new AudioClip(this.startAudio).play());
 		stage.setTitle("Flappy Bird");
 		stage.setScene(scene);
 		stage.show();
@@ -244,3 +256,4 @@ public class Main extends Application {
 		Application.launch();
 	}
 }
+
