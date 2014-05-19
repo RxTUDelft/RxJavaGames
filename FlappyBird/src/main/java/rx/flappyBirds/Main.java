@@ -9,19 +9,26 @@ import java.util.stream.Collectors;
 
 import javafx.application.Application;
 import javafx.geometry.Bounds;
+import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
+import javafx.scene.control.Label;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.StackPane;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Line;
+import javafx.scene.text.Font;
 import javafx.stage.Stage;
 import rx.Observable;
+import rx.Scheduler;
 import rx.functions.Func1;
+import rx.subjects.BehaviorSubject;
 
 public class Main extends Application {
+	
+	private int score = 0;
 
 	@Override
 	public void start(Stage stage) {
@@ -33,9 +40,11 @@ public class Main extends Application {
 		Scene scene = new Scene(root, screenWidth, screenHeight);
 
 		// time
+		Scheduler scheduler = new FxScheduler();
 		Observable<Integer> clock = Observable.timer(0, 10, TimeUnit.MILLISECONDS)
 				.map(x -> 1)
-				.observeOn(new FxScheduler());
+				.observeOn(scheduler);
+		BehaviorSubject<Integer> scoreObservable = BehaviorSubject.create(this.score);
 
 		// Constants
 		double gravity = 0.1;
@@ -76,7 +85,7 @@ public class Main extends Application {
 		Image pipeImg = new Image("pipe.png");
 		double pipeWidth = pipeImg.getWidth();
 		double pipeDist = screenWidth * 2 / 3;
-		List<ImageView[]> pipes = new ArrayList<>();
+		List<ImageView[]> pipes = new ArrayList<>(3);
 		int[] heights = { 100, 150, 200, 250, 300, 350, 400, 450, 500 };
 		Random random = new Random();
 		for (int i = 0; i < 3; i++) {
@@ -111,6 +120,27 @@ public class Main extends Application {
 						}
 					}));
 
+		// Score lines
+		List<Line> lines = new ArrayList<>(3);
+		for (int i = 0; i < 3; i++) {
+			Line line = new Line(screenWidth / 2, -screenHeight, screenWidth / 2, 0);
+			root.getChildren().add(line);
+			line.setStroke(Color.TRANSPARENT);
+			line.setTranslateX((i + 2.5) * pipeDist + pipeWidth/2);
+			lines.add(line);
+		}
+
+		clock.map(i -> 2).subscribe(v ->
+				lines.stream().forEach(line -> {
+					double dx = line.getTranslateX();
+					if (dx <= pipeWidth) {
+						line.setTranslateX(3 * pipeDist + pipeWidth);
+					}
+						else {
+							line.setTranslateX(dx - v);
+						}
+					}));
+
 		// Flappy
 		Image flappyImg = new Image("Flappy.gif");
 		Image flappyBoundImg = new Image("FlappyBounding.png");
@@ -121,35 +151,66 @@ public class Main extends Application {
 		double flappyInitY = -screenHeight / 2;
 		flappy.setTranslateX(screenWidth / 4 - flappyImg.getWidth() / 2);
 		flappyB.setTranslateX(36 + screenWidth / 4 - flappyImg.getWidth() / 2);
-		flappyB.setScaleX(0.9);
-		flappyB.setScaleY(0.9);
-		
-		Observable<List<KeyEvent>> spaceBarEvents = SpacebarObservable.spaceBar(scene).buffer(clock);
+		flappyB.setScaleX(0.95);
+		flappyB.setScaleY(0.95);
+
+		Observable<List<KeyEvent>> spaceBarEvents = SpacebarObservable.spaceBar(scene)
+				.buffer(clock);
 		Observable<Boolean> impulsForce = spaceBarEvents.map(list -> !list.isEmpty());
-		Observable<Double> velocity = impulsForce.scan(0.0, (vOld, i) -> i ? impuls : vOld - gravity);
-		Observable<Double> yPos = velocity.scan(flappyInitY, (yOld, dv) -> Math.min(yOld - dv, -bottomHeight));
+		Observable<Double> velocity = impulsForce.scan(0.0, (vOld, i) -> i ? impuls : vOld
+				- gravity);
+		Observable<Double> yPos = velocity.scan(flappyInitY,
+				(yOld, dv) -> Math.min(yOld - dv, -bottomHeight));
 		yPos.subscribe(y -> {
 			flappy.setTranslateY(y);
 			flappyB.setTranslateY(y);
 		});
 		
+		// Score system
+		Label label = new Label();
+		root.getChildren().add(label);
+		StackPane.setMargin(label, new Insets(20, 0, 0, 0));
+		StackPane.setAlignment(label, Pos.TOP_CENTER);
+		label.setFont(Font.font("Comic Sans MS", 32));
+		label.setTextFill(Color.DARKRED);
+		scoreObservable.subscribe(i -> label.setText("" + i));
+
 		// Collision detection
-		Func1<ImageView, Observable<Bounds>> func1 = iv -> clock.map(i -> iv.localToScene(iv.getLayoutBounds()));
+		Func1<ImageView, Observable<Bounds>> func1Pipes = iv -> clock.map(i -> iv.localToScene(iv
+				.getLayoutBounds()));
 		List<Observable<Bounds>> pipeBounds = pipes.stream()
 				.flatMap(ivs -> Arrays.stream(ivs))
-				.map(iv -> func1.call(iv))
+				.map(iv -> func1Pipes.call(iv))
 				.collect(Collectors.toList());
 		
-		Observable<Bounds> flappyBounds = clock.map(i -> flappyB.localToScene(flappyB.getLayoutBounds()));
-		
+		Func1<Line, Observable<Bounds>> func1Lines = line -> clock.map(i -> line.localToScene(line.getLayoutBounds())); 
+		List<Observable<Bounds>> lineBounds = lines.stream()
+				.map(line -> func1Lines.call(line))
+				.collect(Collectors.toList());
+
+		Observable<Bounds> flappyBounds = clock.map(i -> flappyB.localToScene(flappyB
+				.getLayoutBounds()));
+
 		pipeBounds.stream()
-				.forEach(pipeBound ->
-						Observable.combineLatest(pipeBound, flappyBounds, (p, f) -> p.intersects(f))
+				.forEach(
+						pipeBound -> Observable
+								.combineLatest(pipeBound, flappyBounds, (p, f) -> p.intersects(f))
 								.buffer(2, 1)
 								.filter(hits -> hits.get(0) != hits.get(1))
 								.subscribe(hits -> {
 									if (!hits.get(0)) {
 										System.out.println("LOST!!!");
+									}
+								}));
+
+		lineBounds.stream()
+				.forEach(
+						line -> Observable.combineLatest(line, flappyBounds, (l, f) -> l.intersects(f))
+								.buffer(2, 1)
+								.filter(hits -> hits.get(0) != hits.get(1))
+								.subscribe(hits -> {
+									if (!hits.get(0)) {
+										scoreObservable.onNext(++this.score);
 									}
 								}));
 
