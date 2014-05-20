@@ -30,6 +30,7 @@ import rx.subjects.BehaviorSubject;
 
 public class Main extends Application {
 
+	private int highScore = 0;
 	private int score = 0;
 
 	private final String jumpAudio = this.getClass().getResource("/jump.wav").toString();
@@ -51,6 +52,7 @@ public class Main extends Application {
 				.map(x -> 1)
 				.observeOn(new FxScheduler());
 		BehaviorSubject<Integer> scoreObservable = BehaviorSubject.create(this.score);
+		BehaviorSubject<Integer> highScoreObservable = BehaviorSubject.create(this.highScore);
 
 		// Constants
 		double gravity = 0.1;
@@ -164,6 +166,7 @@ public class Main extends Application {
 		flappyB.setScaleY(0.95);
 
 		Observable<List<KeyEvent>> spaceBarEvents = SpacebarObservable.spaceBar(scene)
+				.distinctUntilChanged()
 				.doOnEach(event -> new AudioClip(this.jumpAudio).play())
 				.buffer(clock);
 		Observable<Boolean> impulsForce = spaceBarEvents.map(list -> !list.isEmpty());
@@ -182,10 +185,23 @@ public class Main extends Application {
 		StackPane.setMargin(label, new Insets(20, 0, 0, 0));
 		StackPane.setAlignment(label, Pos.TOP_CENTER);
 		label.setFont(Font.font("Tohama", FontWeight.BOLD, 50));
-		label.setTextFill(Color.BLACK);
+		label.setTextFill(Color.WHITE);
 		label.setPadding(new Insets(5));
+		label.setStyle("-fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.5), 5, 0, 2, 2);");
 		Subscription scoreSubscription = scoreObservable.subscribe(i ->
 				label.setText("score: " + i));
+		
+		// HighScore system
+		Label highScoreLabel = new Label();
+		root.getChildren().add(highScoreLabel);
+		StackPane.setMargin(highScoreLabel, new Insets(90, 0, 0, 0));
+		StackPane.setAlignment(highScoreLabel, Pos.TOP_CENTER);
+		highScoreLabel.setFont(Font.font("Tohama", FontWeight.LIGHT, 25));
+		highScoreLabel.setTextFill(Color.WHITE);
+		highScoreLabel.setPadding(new Insets(5));
+		highScoreLabel.setStyle("-fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.5), 3, 0, 1, 1);");
+		Subscription highScoreSubscription = highScoreObservable.subscribe(i ->
+				highScoreLabel.setText("highscore: " + i));
 
 		// Collision detection
 		Func1<ImageView, Observable<Bounds>> func1Pipes = iv -> clock.map(i ->
@@ -216,6 +232,7 @@ public class Main extends Application {
 								scoreLineSubscription.unsubscribe();
 								flappySubscription.unsubscribe();
 								scoreSubscription.unsubscribe();
+								highScoreSubscription.unsubscribe();
 
 								new AudioClip(this.lostAudio).play();
 
@@ -226,11 +243,18 @@ public class Main extends Application {
 								Label lostLabel = new Label("GAME OVER!!!");
 								lostPane.getChildren().add(lostLabel);
 								lostLabel
-										.setStyle("-fx-background-color: rgb(255,128,64);");
-								lostLabel.setFont(Font.font("Tohama",
-										FontWeight.BOLD, 50));
+										.setStyle("-fx-background-color: rgb(255, 184, 16);\n"
+												+ "-fx-background-radius: 40px;\n"
+												+ "-fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.65), 10, 0, 10, 10);");
+								lostLabel.setFont(Font.font("Tahoma", FontWeight.BOLD, 50));
 								lostLabel.setPadding(new Insets(5, 10, 5, 10));
-								lostLabel.setTextFill(Color.BLACK);
+								lostLabel.setTextFill(Color.WHITE);
+								
+								SpacebarObservable.spaceBar(scene)
+										.subscribe(event -> {
+											this.score = 0;
+											this.start(stage);
+										});
 							}
 						}));
 
@@ -242,6 +266,10 @@ public class Main extends Application {
 						.subscribe(hits -> {
 							if (!hits.get(0)) {
 								scoreObservable.onNext(++this.score);
+								if (this.highScore <= this.score) {
+									this.highScore = this.score;
+									highScoreObservable.onNext(this.highScore);
+								}
 								new AudioClip(this.scoreAudio).play();
 							}
 						}));
