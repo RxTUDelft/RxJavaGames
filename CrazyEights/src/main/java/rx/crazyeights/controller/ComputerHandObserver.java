@@ -37,8 +37,13 @@ public class ComputerHandObserver implements Observer<ArrayList<Card>> {
 		int numberOfCards = hand.size();
 
 		int cardWidth = 90;
-		int widthPerCard = 40;
-		int totalHandWidth = widthPerCard * numberOfCards;
+		double widthPerCard;
+		if(numberOfCards <= 18) {
+			widthPerCard = 40;
+		} else {
+			widthPerCard = (770-cardWidth) / (numberOfCards-1.0);
+		}
+		double totalHandWidth = widthPerCard * (numberOfCards-1) + cardWidth;
 		double initialMarginLeft = (800-totalHandWidth)/2;
 
 		for (int i = 0; i < numberOfCards; i++) {

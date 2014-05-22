@@ -19,6 +19,7 @@ public class Game {
 	private int won, lost;
 
 	public final PublishSubject<String> wonLostObservable = PublishSubject.create();
+	public final PublishSubject<Suit> changedSuitObservable = PublishSubject.create();
 
 	public Game() {
 		stockPile = new StockPile();
@@ -54,7 +55,7 @@ public class Game {
 			humanPlayer.addCard(stockPile.draw());
 			computerPlayer.addCard(stockPile.draw());
 		}
-
+		
 		// get first card from the stock pile and add it to the discard pile
 		discardPile.addCard(stockPile.draw());
 	}
@@ -67,9 +68,20 @@ public class Game {
 		Card drawn = stockPile.draw();
 
 		if (stockPile.getSize() == 0) {
-			Stack<Card> discardPileCards = discardPile.getCardsWithoutTop();
-			stockPile.addCards(discardPileCards);
-			stockPile.shuffle();
+			if(discardPile.getSize() > 1) {
+				//reuse cards in discard pile
+				Stack<Card> discardPileCards = discardPile.getCardsWithoutTop();
+				stockPile.addCards(discardPileCards);
+				stockPile.shuffle();
+			} else {
+				//add new card deck
+				for (Suit s : Suit.values()) {
+					for (Rank r : Rank.values()) {
+						stockPile.addCard(new Card(s, r));
+					}
+				}
+				stockPile.shuffle();
+			}
 		}
 
 		return drawn;
@@ -98,6 +110,11 @@ public class Game {
 			} else {
 				if (c.getRank() == Rank.EIGHT) {
 					showEightDialog(p);
+					if(p.equals(computerPlayer)) {
+						changedSuitObservable.onNext(overruledSuit);
+					}
+				} else {
+					changedSuitObservable.onNext(null);
 				}
 
 				switchTurns();

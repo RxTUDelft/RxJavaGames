@@ -1,5 +1,6 @@
 package rx.crazyeights.view;
 
+import javafx.scene.control.Label;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.BorderPane;
@@ -17,21 +18,43 @@ public class GameView extends BorderPane {
 	ImageView stockPileView, discardPileView;
 	StackPane humanPlayerHand, computerPlayerHand;
 	Text won, lost;
+	Label invalidPlayMessage, changedSuitMessage;
 
 	public GameView(Game game) {
 		getStylesheets().add(getClass().getResource("/Style.css").toExternalForm());
 		setId("gameView");
 
 		// menu
-		GridPane menu = new GridPane();
+		BorderPane menu = new BorderPane();
 		menu.setId("menu");
-		menu.add(new Text("Crazy Eights"), 0, 0, 2, 1);
-		menu.add(new Text("Won: "), 0, 1);
+		
+		GridPane topMenu = new GridPane();
+		topMenu.setId("topMenu");
+		topMenu.add(new Text("Crazy Eights"), 0, 0, 2, 1);
+		topMenu.add(new Text("Won: "), 0, 1);
 		won = new Text("0");
-		menu.add(won, 1, 1);
-		menu.add(new Text("Lost: "), 0, 2);
+		topMenu.add(won, 1, 1);
+		topMenu.add(new Text("Lost: "), 0, 2);
 		lost = new Text("0");
-		menu.add(lost, 1, 2);
+		topMenu.add(lost, 1, 2);
+		menu.setTop(topMenu);
+		
+		StackPane bottomMenu = new StackPane();
+		bottomMenu.setId("bottomMenu");
+		
+		changedSuitMessage = new Label("Suit changed to ");
+		changedSuitMessage.setId("changedSuitMessage");
+		bottomMenu.getChildren().add(changedSuitMessage);
+		changedSuitMessage.setTranslateY(65);
+		
+		invalidPlayMessage = new Label("Invalid play");
+		invalidPlayMessage.setId("invalidPlayMessage");
+		bottomMenu.getChildren().add(invalidPlayMessage);
+		invalidPlayMessage.setTranslateY(40);
+		invalidPlayMessage.toBack();
+		
+		menu.setBottom(bottomMenu);
+		
 		this.setLeft(menu);
 		
 		// piles
@@ -58,7 +81,7 @@ public class GameView extends BorderPane {
 		humanPlayerHand.setId("humanPlayerHand");
 		humanPlayerHand.setPrefWidth(800);
 		humanPlayerHand.setPrefHeight(140);
-		game.getHumanPlayer().subscribe(new PlayerHandObserver(game, humanPlayerHand));
+		game.getHumanPlayer().subscribe(new PlayerHandObserver(game, this));
 		this.setBottom(humanPlayerHand);
 
 		// computer player
@@ -92,5 +115,13 @@ public class GameView extends BorderPane {
 	
 	public Text getLost() {
 		return lost;
+	}
+	
+	public Label getInvalidPlayMessage() {
+		return invalidPlayMessage;
+	}
+	
+	public Label getChangedSuitMessage() {
+		return changedSuitMessage;
 	}
 }

@@ -1,5 +1,8 @@
 package rx.crazyeights.controller;
 
+import javafx.animation.TranslateTransition;
+import javafx.util.Duration;
+
 import org.controlsfx.dialog.Dialogs;
 
 import rx.crazyeights.model.Card;
@@ -30,6 +33,19 @@ public class GameController {
 				gameView.getWon().setText(game.getWon() + "");
 			} else {
 				gameView.getLost().setText(game.getLost() + "");
+			}
+		});
+		
+		game.changedSuitObservable.subscribe(suit -> {
+			if(suit == null) {
+				TranslateTransition downTransition = new TranslateTransition(Duration.millis(200), gameView.getChangedSuitMessage());
+				downTransition.setToY(65);
+				downTransition.play();
+			} else {
+				gameView.getChangedSuitMessage().setText("Suit changed to\n" + suit);
+				TranslateTransition upTransition = new TranslateTransition(Duration.millis(300), gameView.getChangedSuitMessage());
+				upTransition.setToY(0);
+				upTransition.play();
 			}
 		});
 	}
