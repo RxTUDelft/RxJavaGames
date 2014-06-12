@@ -8,6 +8,7 @@ import javafx.scene.layout.StackPane;
 import javafx.stage.Stage;
 import rx.chainrx.controller.Observables;
 import rx.chainrx.model.Level;
+import rx.chainrx.model.LevelSpecification;
 import rx.chainrx.view.DialogMessage;
 
 public class Main extends Application {

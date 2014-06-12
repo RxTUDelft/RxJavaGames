@@ -1,4 +1,4 @@
-package rx.chainrx;
+package rx.chainrx.model;
 
 public class LevelSpecification {
 	private int numberOfBalls, ballsToExpand;
