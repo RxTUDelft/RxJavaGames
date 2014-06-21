@@ -36,7 +36,9 @@ public class Player extends Observable<Player> {
 	
 	public void move(Direction direction) {
 		if(direction == Direction.RIGHT) {
-			setPosition(x+2, y);
+			if(x < view.getScene().getWidth()) {
+				setPosition(x+2, y);
+			}
 		}
 		else if (direction == Direction.LEFT) {
 			if(x > 0 ) {

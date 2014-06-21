@@ -1,7 +1,16 @@
 #levelView {
 	-fx-alignment: top-left ;
 	-fx-background-color: #D0F4F7;
-	-fx-pref-width: 1200px;
-	-fx-pref-height: 600px;
 }
 
+#lostView, #wonView {
+	-fx-alignment: center;
+	-fx-font-family: Verdana;
+	-fx-font-size: 20pt;
+}
+#lostView {
+	-fx-background-color: beige;
+}
+#wonView {
+	-fx-background-color: lightgreen;
+}

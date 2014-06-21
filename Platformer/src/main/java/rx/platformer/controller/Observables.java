@@ -15,15 +15,13 @@ import rx.subscriptions.Subscriptions;
 public enum Observables {
 	;// no class instances
 
-	public static ConnectableObservable<Integer> clock(Long frameRate,
-			TimeUnit unit, Scheduler scheduler) {
+	public static ConnectableObservable<Integer> clock(Long frameRate, TimeUnit unit, Scheduler scheduler) {
 		return Observable.interval(frameRate, unit).map(x -> 1)
 				.observeOn(scheduler).publish();
 	}
 
 	public static ConnectableObservable<Integer> clock(Long frameRate) {
-		return clock(frameRate, TimeUnit.MILLISECONDS,
-				FxScheduler.getInstance());
+		return clock(frameRate, TimeUnit.MILLISECONDS, FxScheduler.getInstance());
 	}
 
 	public static Observable<KeyEvent> keyPress(Scene scene) {
