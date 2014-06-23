@@ -59,8 +59,8 @@ public class GameManager extends Group {
     private final List<Integer> traversalY;
     private final List<Location> locations = new ArrayList<>();
     private final Map<Location, Tile> gameGrid;
-    private final BooleanProperty gameWonProperty = new SimpleBooleanProperty(false);
-    private final BooleanProperty gameOverProperty = new SimpleBooleanProperty(false);
+    private PublishSubject<Boolean> gameWon = PublishSubject.create();
+    private PublishSubject<Boolean> gameOver = PublishSubject.create();
     private final IntegerProperty gameScoreProperty = new SimpleIntegerProperty(0);
     private final Set<Tile> mergedToBeRemoved = new HashSet<>();
     private final ParallelTransition parallelTransition = new ParallelTransition();
@@ -139,7 +139,7 @@ public class GameManager extends Group {
                 this.gameScoreProperty.set(this.gameScoreProperty.get() + tileToBeMerged.getValue());
 
                 if (tileToBeMerged.getValue() == FINAL_VALUE_TO_WIN) {
-                    this.gameWonProperty.set(true);
+                	this.gameWon.onNext(true);
                 }
                 return 1;
             } else if (farthestLocation.equals(tile.getLocation()) == false) {
@@ -168,7 +168,7 @@ public class GameManager extends Group {
             // game is over if there is no more moves
             Location randomAvailableLocation = findRandomAvailableLocation();
             if (randomAvailableLocation == null && !mergeMovementsAvailable()) {
-                this.gameOverProperty.set(true);
+            	this.gameOver.onNext(true);
             } else if (randomAvailableLocation != null && tilesWereMoved > 0) {
                 addAndAnimateRandomTile(randomAvailableLocation);
             }
@@ -285,7 +285,6 @@ public class GameManager extends Group {
                 }))
                 .flatMap(s -> s)
                 .forEach(r -> this.gridGroup.getChildren().add((Node) r));
-//                .forEach(gridGroup.getChildren()::add);
 
         this.gridGroup.getStyleClass().add("grid");
         this.gridGroup.setManaged(false);
@@ -304,7 +303,7 @@ public class GameManager extends Group {
     }
 
     private void initGameProperties() {
-        this.gameOverProperty.addListener((observable, oldValue, newValue) -> {
+    	this.gameOver.subscribe(newValue -> {
             if (newValue) {
                 this.layerOnProperty.set(true);
                 this.hOvrLabel.getStyleClass().setAll("over");
@@ -330,7 +329,7 @@ public class GameManager extends Group {
             }
         });
 
-        this.gameWonProperty.addListener((observable, oldValue, newValue) -> {
+        this.gameWon.subscribe(newValue -> {
             if (newValue) {
                 this.layerOnProperty.set(true);
                 this.hOvrLabel.getStyleClass().setAll("won");
@@ -370,8 +369,8 @@ public class GameManager extends Group {
 
         this.layerOnProperty.set(false);
         this.gameScoreProperty.set(0);
-        this.gameWonProperty.set(false);
-        this.gameOverProperty.set(false);
+        this.gameWon.onNext(false);
+        this.gameOver.onNext(false);
 
         initializeLocationsInGameGrid();
     }
@@ -513,7 +512,7 @@ public class GameManager extends Group {
     // after last movement on full grid, check if there are movements available
     private EventHandler<ActionEvent> onFinishNewlyAddedTile = e -> {
         if (this.gameGrid.values().parallelStream().noneMatch(Objects::isNull) && !mergeMovementsAvailable()) {
-            this.gameOverProperty.set(true);
+        	this.gameOver.onNext(true);
         }
     };
 
