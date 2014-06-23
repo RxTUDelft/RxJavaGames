@@ -29,42 +29,32 @@ public class SessionManager {
 
     public void saveSession(Map<Location, Tile> gameGrid, Integer score) {
         try {
-            IntStream.range(0, grid_size).boxed().forEach(t_x -> {
-                IntStream.range(0, grid_size).boxed().forEach(t_y -> {
+            IntStream.range(0, this.grid_size).boxed().forEach(t_x -> {
+                IntStream.range(0, this.grid_size).boxed().forEach(t_y -> {
                     Tile t = gameGrid.get(new Location(t_x, t_y));
-                    props.setProperty("Location_" + t_x.toString() + "_" + t_y.toString(),
+                    this.props.setProperty("Location_" + t_x.toString() + "_" + t_y.toString(),
                             t != null ? t.getValue().toString() : "0");
                 });
             });
-            props.setProperty("score", score.toString());
-            props.store(new FileWriter(SESSION_PROPERTIES_FILENAME), SESSION_PROPERTIES_FILENAME);
+            this.props.setProperty("score", score.toString());
+            this.props.store(new FileWriter(this.SESSION_PROPERTIES_FILENAME), this.SESSION_PROPERTIES_FILENAME);
         } catch (IOException ex) {
             Logger.getLogger(getClass().getName()).log(Level.SEVERE, null, ex);
         }
     }
 
     public int restoreSession(Map<Location, Tile> gameGrid) {
-        Reader reader = null;
-        try {
-            reader = new FileReader(SESSION_PROPERTIES_FILENAME);
-            props.load(reader);
+        try (Reader reader = new FileReader(this.SESSION_PROPERTIES_FILENAME)) {
+            this.props.load(reader);
         } catch (FileNotFoundException ignored) {
             return -1;
         } catch (IOException ex) {
             Logger.getLogger(getClass().getName()).log(Level.SEVERE, null, ex);
-        } finally {
-            try {
-                if (reader != null) {
-                    reader.close();
-                }
-            } catch (IOException ex) {
-                Logger.getLogger(getClass().getName()).log(Level.SEVERE, null, ex);
-            }
         }
 
-        IntStream.range(0, grid_size).boxed().forEach(t_x -> {
-            IntStream.range(0, grid_size).boxed().forEach(t_y -> {
-                String val = props.getProperty("Location_" + t_x.toString() + "_" + t_y.toString());
+        IntStream.range(0, this.grid_size).boxed().forEach(t_x -> {
+            IntStream.range(0, this.grid_size).boxed().forEach(t_y -> {
+                String val = this.props.getProperty("Location_" + t_x.toString() + "_" + t_y.toString());
                 if (!val.equals("0")) {
                     Tile t = Tile.newTile(new Integer(val));
                     Location l = new Location(t_x, t_y);
@@ -74,7 +64,7 @@ public class SessionManager {
             });
         });
 
-        String score = props.getProperty("score");
+        String score = this.props.getProperty("score");
         if (score != null) {
             return new Integer(score);
         }

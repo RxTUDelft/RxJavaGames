@@ -18,16 +18,16 @@ public enum Direction {
     }
 
     public int getX() {
-        return x;
+        return this.x;
     }
 
     public int getY() {
-        return y;
+        return this.y;
     }
 
     @Override
     public String toString() {
-        return "Direction{" + "y=" + y + ", x=" + x + '}' + name();
+        return "Direction{" + "y=" + this.y + ", x=" + this.x + '}' + name();
     }
 
     public Direction goBack() {
