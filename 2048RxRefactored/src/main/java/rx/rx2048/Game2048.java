@@ -8,8 +8,12 @@ import javafx.geometry.Bounds;
 import javafx.scene.Cursor;
 import javafx.scene.Scene;
 import javafx.scene.input.KeyCode;
+import javafx.scene.input.KeyEvent;
+import javafx.scene.input.SwipeEvent;
 import javafx.scene.layout.StackPane;
 import javafx.stage.Stage;
+import rx.Observable;
+import rx.rx2048.rxUtils.Observables;
 
 /**
  * @author bruno.borges@oracle.com
@@ -59,29 +63,18 @@ public class Game2048 extends Application {
     }
 
     private void addKeyHandler(Scene scene) {
-        scene.setOnKeyPressed(ke -> {
-            KeyCode keyCode = ke.getCode();
-            if (keyCode.equals(KeyCode.S)) {
-                this.gameManager.saveSession();
-                return;
-            }
-            if (keyCode.equals(KeyCode.R)) {
-                this.gameManager.restoreSession();
-                return;
-            }
-            if (keyCode.isArrowKey() == false) {
-                return;
-            }
-            Direction direction = Direction.valueFor(keyCode);
-            this.gameManager.move(direction);
-        });
+    	Observable<KeyCode> keyHandler = Observables.keyPress(scene).map(KeyEvent::getCode);
+    	keyHandler.filter(KeyCode::isArrowKey)
+    			.map(Direction::valueFor)
+    			.subscribe(this.gameManager::move);
+    	keyHandler.filter(KeyCode.R::equals)
+				.subscribe(key -> this.gameManager.restoreSession());
+    	keyHandler.filter(KeyCode.S::equals)
+				.subscribe(key -> this.gameManager.saveSession());
     }
 
     private void addSwipeHandlers(Scene scene) {
-        scene.setOnSwipeUp(e -> this.gameManager.move(Direction.UP));
-        scene.setOnSwipeRight(e -> this.gameManager.move(Direction.RIGHT));
-        scene.setOnSwipeLeft(e -> this.gameManager.move(Direction.LEFT));
-        scene.setOnSwipeDown(e -> this.gameManager.move(Direction.DOWN));
+    	Observables.swipe(scene).map(Direction::valueFor).subscribe(this.gameManager::move);
     }
 
     /**

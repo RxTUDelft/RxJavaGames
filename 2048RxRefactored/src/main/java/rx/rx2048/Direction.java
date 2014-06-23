@@ -1,6 +1,7 @@
 package rx.rx2048;
 
 import javafx.scene.input.KeyCode;
+import javafx.scene.input.SwipeEvent;
 
 /**
  * @author bruno.borges@oracle.com
@@ -46,5 +47,9 @@ public enum Direction {
 
     public static Direction valueFor(KeyCode keyCode) {
         return valueOf(keyCode.name());
+    }
+
+    public static Direction valueFor(SwipeEvent swipeDirection) {
+    	return valueOf(swipeDirection.getEventType().getName().replace("SWIPE_", ""));
     }
 }
