@@ -9,12 +9,13 @@ At this moment, **5** games are finished:
 * Tic Tac Toe
 * Crazy Eights
 * Flappy Bird
+* [ChainRx](http://www.yvoschaap.com/chainrxn/)
 
 We are currently working on the following games:
 * [2048](http://gabrielecirulli.github.io/2048/)
-* [ChainRx](http://www.yvoschaap.com/chainrxn/)
+* Platform game / sidescroller
 
 Further down the line we plan to do:
 * JPacman (a Java port of Pacman) - refactoring of an [already existing version](https://github.com/SERG-Delft/jpacman-framework/)
 * Wolfenstein
-* Another game that we haven't decided on
+

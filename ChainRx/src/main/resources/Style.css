@@ -1,0 +1,29 @@
+#root {
+	-fx-alignment: top-left ;
+	-fx-font-size: 12pt;
+	-fx-font-family: Arial;
+	-fx-background-color: whitesmoke ;
+}
+
+#playerInfo {
+	-fx-padding: 10px;
+}
+
+#playerCircleMoving {
+	-fx-fill: rgb(255,255,255);
+	-fx-effect: innershadow(gaussian, rgba(0, 0, 0, 0.65), 15, 0.2, 0.0, 0.0);
+}
+
+#playerCirclePlaced {
+	-fx-fill: black;
+}
+
+#dialog {
+	-fx-max-height: 100;
+	-fx-background-color: rgb(128,128,128);
+	-fx-alignment: center;
+}
+
+#dialogMessage {
+	-fx-fill: white ;
+}
