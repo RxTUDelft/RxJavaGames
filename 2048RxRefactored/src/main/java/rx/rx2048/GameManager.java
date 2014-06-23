@@ -16,6 +16,7 @@ import java.util.function.IntBinaryOperator;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
+
 import javafx.animation.KeyFrame;
 import javafx.animation.KeyValue;
 import javafx.animation.ParallelTransition;
@@ -36,6 +37,7 @@ import javafx.scene.layout.Priority;
 import javafx.scene.layout.VBox;
 import javafx.scene.shape.Rectangle;
 import javafx.util.Duration;
+import rx.subjects.PublishSubject;
 
 /**
  *
@@ -60,7 +62,6 @@ public class GameManager extends Group {
     private final BooleanProperty gameWonProperty = new SimpleBooleanProperty(false);
     private final BooleanProperty gameOverProperty = new SimpleBooleanProperty(false);
     private final IntegerProperty gameScoreProperty = new SimpleIntegerProperty(0);
-    private final IntegerProperty gameMovePoints = new SimpleIntegerProperty(0);
     private final Set<Tile> mergedToBeRemoved = new HashSet<>();
     private final ParallelTransition parallelTransition = new ParallelTransition();
     private final BooleanProperty layerOnProperty = new SimpleBooleanProperty(false);
@@ -104,9 +105,13 @@ public class GameManager extends Group {
                 return;
             }
         }
-
-        this.gameMovePoints.set(0);
-
+        
+        //TODO replace Subject
+        PublishSubject<Integer> pointPublisher = PublishSubject.create();
+        pointPublisher.scan((i, sum) -> i + sum).last().filter(total -> total > 0)
+        		.doOnNext(total -> this.animateScore(total.toString()).play())
+        		.subscribe(total -> {}, exception -> {});
+        		
         Collections.sort(this.traversalX, direction.getX() == 1 ? Collections.reverseOrder() : Integer::compareTo);
         Collections.sort(this.traversalY, direction.getY() == 1 ? Collections.reverseOrder() : Integer::compareTo);
         final int tilesWereMoved = traverseGrid((int x, int y) -> {
@@ -130,7 +135,7 @@ public class GameManager extends Group {
                 this.parallelTransition.getChildren().add(hideTileToBeMerged(tile));
                 this.mergedToBeRemoved.add(tile);
 
-                this.gameMovePoints.set(this.gameMovePoints.get() + tileToBeMerged.getValue());
+                pointPublisher.onNext(tileToBeMerged.getValue());
                 this.gameScoreProperty.set(this.gameScoreProperty.get() + tileToBeMerged.getValue());
 
                 if (tileToBeMerged.getValue() == FINAL_VALUE_TO_WIN) {
@@ -150,11 +155,9 @@ public class GameManager extends Group {
 
             return 0;
         });
-
-        if (this.gameMovePoints.get() > 0) {
-            animateScore(this.gameMovePoints.getValue().toString()).play();
-        }
-
+        
+        pointPublisher.onCompleted();
+        
         this.parallelTransition.setOnFinished(e -> {
             synchronized (this.gameGrid) {
                 this.movingTiles = false;
