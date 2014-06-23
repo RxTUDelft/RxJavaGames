@@ -9,7 +9,6 @@ import javafx.scene.Cursor;
 import javafx.scene.Scene;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
-import javafx.scene.input.SwipeEvent;
 import javafx.scene.layout.StackPane;
 import javafx.stage.Stage;
 import rx.Observable;
@@ -62,6 +61,9 @@ public class Game2048 extends Application {
         return System.getProperty("os.arch").toUpperCase().contains("ARM");
     }
 
+    /**
+     * @author Richard van Heest
+     */
     private void addKeyHandler(Scene scene) {
     	Observable<KeyCode> keyHandler = Observables.keyPress(scene).map(KeyEvent::getCode);
     	keyHandler.filter(KeyCode::isArrowKey)
@@ -73,6 +75,9 @@ public class Game2048 extends Application {
 				.subscribe(key -> this.gameManager.saveSession());
     }
 
+    /**
+     * @author Richard van Heest
+     */
     private void addSwipeHandlers(Scene scene) {
     	Observables.swipe(scene).map(Direction::valueFor).subscribe(this.gameManager::move);
     }
