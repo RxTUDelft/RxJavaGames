@@ -11,6 +11,9 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.stream.IntStream;
 
+import rx.Observable;
+import rx.schedulers.Schedulers;
+
 /**
  *
  * @author José Pereda
@@ -52,17 +55,18 @@ public class SessionManager {
             Logger.getLogger(getClass().getName()).log(Level.SEVERE, null, ex);
         }
 
-        IntStream.range(0, this.grid_size).boxed().forEach(t_x -> {
-            IntStream.range(0, this.grid_size).boxed().forEach(t_y -> {
-                String val = this.props.getProperty("Location_" + t_x.toString() + "_" + t_y.toString());
-                if (!val.equals("0")) {
-                    Tile t = Tile.newTile(new Integer(val));
-                    Location l = new Location(t_x, t_y);
-                    t.setLocation(l);
-                    gameGrid.put(l, t);
-                }
-            });
-        });
+        Observable.range(0, this.grid_size)
+        		.flatMap(x -> Observable.range(0, this.grid_size)
+        				.<Location>map(y -> new Location(x, y)))
+        		.map(loc -> {
+					String val = this.props.getProperty("Location_" + loc.getX() + "_" + loc.getY());
+					Tile t = Tile.newTile(new Integer(val));
+					t.setLocation(loc);
+					return t;
+				})
+        		.filter(tile -> !tile.getValue().equals(Integer.valueOf(0)))
+        		.observeOn(Schedulers.computation())
+        		.subscribe(tile -> gameGrid.put(tile.getLocation(), tile));
 
         String score = this.props.getProperty("score");
         if (score != null) {
