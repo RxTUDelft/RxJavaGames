@@ -54,6 +54,11 @@
     -fx-text-fill: #f2b179; /* f9f6f2 */
     -fx-effect: dropshadow( three-pass-box, rgba(243, 215, 116, 1), 10, 0.5, 0, 0 );
 }
+.rxsubtitle {
+    -fx-font-size: 40px;
+    -fx-text-fill: #f27979;
+    -fx-effect: dropshadow( three-pass-box, rgba(116, 173, 243, 1), 10, 0.5, 0, 0 );
+}
 .over {
     -fx-opacity: 0.6;
     -fx-background-color: #f9f6f2;

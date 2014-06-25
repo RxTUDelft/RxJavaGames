@@ -50,7 +50,7 @@ public class Game2048 extends Application {
             scene.setCursor(Cursor.NONE);
         }
 
-        primaryStage.setTitle("2048FX");
+        primaryStage.setTitle("Rx2048Fx");
         primaryStage.setScene(scene);
         primaryStage.setMinWidth(this.gameBounds.getWidth());
         primaryStage.setMinHeight(this.gameBounds.getHeight());

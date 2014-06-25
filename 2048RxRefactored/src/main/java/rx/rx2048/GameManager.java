@@ -239,6 +239,8 @@ public class GameManager extends Group {
     }
 
     private void createScore() {
+    	Label rxSubtitle = new Label("RX");
+		rxSubtitle.getStyleClass().add("rxsubtitle");
         Label lblTitle = new Label("2048");
         lblTitle.getStyleClass().add("title");
         Label lblSubtitle = new Label("FX");
@@ -255,7 +257,7 @@ public class GameManager extends Group {
         this.lblScore.textProperty().bind(this.gameScoreProperty.asString());
         vScore.getChildren().addAll(lblTit, this.lblScore);
 
-        this.hTop.getChildren().addAll(lblTitle, lblSubtitle, hFill, vScore);
+        this.hTop.getChildren().addAll(rxSubtitle, lblTitle, lblSubtitle, hFill, vScore);
         this.hTop.setMinSize(GRID_WIDTH, TOP_HEIGHT);
         this.hTop.setPrefSize(GRID_WIDTH, TOP_HEIGHT);
         this.hTop.setMaxSize(GRID_WIDTH, TOP_HEIGHT);
