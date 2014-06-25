@@ -6,10 +6,10 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.io.Reader;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Properties;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import java.util.stream.IntStream;
 
 import rx.Observable;
 import rx.schedulers.Schedulers;
@@ -32,13 +32,16 @@ public class SessionManager {
 
     public void saveSession(Map<Location, Tile> gameGrid, Integer score) {
         try {
-            IntStream.range(0, this.grid_size).boxed().forEach(t_x -> {
-                IntStream.range(0, this.grid_size).boxed().forEach(t_y -> {
-                    Tile t = gameGrid.get(new Location(t_x, t_y));
-                    this.props.setProperty("Location_" + t_x.toString() + "_" + t_y.toString(),
-                            t != null ? t.getValue().toString() : "0");
-                });
-            });
+        	Observable.range(0, this.grid_size)
+        			.flatMap(x -> Observable.range(0, this.grid_size)
+        					.<Location>map(y -> new Location(x, y)))
+        			.map(gameGrid::get)
+        			.filter(Objects::nonNull)
+        			.observeOn(Schedulers.computation())
+        			.subscribe(tile -> {
+        				Location l = tile.getLocation();
+        				this.props.setProperty("Location_" + l.getX() + "_" + l.getY(), tile.getValue().toString());
+        			});
             this.props.setProperty("score", score.toString());
             this.props.store(new FileWriter(this.SESSION_PROPERTIES_FILENAME), this.SESSION_PROPERTIES_FILENAME);
         } catch (IOException ex) {
@@ -60,11 +63,14 @@ public class SessionManager {
         				.<Location>map(y -> new Location(x, y)))
         		.map(loc -> {
 					String val = this.props.getProperty("Location_" + loc.getX() + "_" + loc.getY());
-					Tile t = Tile.newTile(new Integer(val));
-					t.setLocation(loc);
-					return t;
+					if (val != null) {
+						Tile t = Tile.newTile(new Integer(val));
+						t.setLocation(loc);
+						return t;
+					}
+					return null;
 				})
-        		.filter(tile -> !tile.getValue().equals(Integer.valueOf(0)))
+				.filter(Objects::nonNull)
         		.observeOn(Schedulers.computation())
         		.subscribe(tile -> gameGrid.put(tile.getLocation(), tile));
 
